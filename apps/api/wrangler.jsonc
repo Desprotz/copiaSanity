@@ -6,7 +6,7 @@
   "compatibility_flags": ["nodejs_compat"],
   // Barrido de publicaciones programadas y compilación agrupada (architecture.md: cada 5 min).
   "triggers": { "crons": ["*/5 * * * *"] },
-  "vars": { "BUILD_BATCH_SECONDS": "300" },
+  "vars": { "BUILD_BATCH_SECONDS": "60" },
   "observability": { "enabled": true },
   // El mismo Worker sirve el editor (estáticos compilados) y el API: una sola dirección, sin CORS.
   "assets": { "directory": "../editor/dist", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
