@@ -102,3 +102,41 @@ export function seedDocuments(): CmsDocument[] {
   CATEGORIES.forEach((nombre, i) => docs.push(doc(`categoria_${i + 1}`, 'categoria', { nombre }, { daysAgo: 30, published: true })));
   return docs;
 }
+
+// Segundo sitio ficticio, para comprobar que los sitios no se mezclan.
+export const PORTFOLIO_TYPES: ContentType[] = [
+  {
+    id: 'proyecto', name: 'Proyecto', plural: 'Proyectos', color: 'violet', titleField: 'titulo', version: 1,
+    fields: [
+      { key: 'titulo', label: 'Título', kind: 'string', required: true },
+      { key: 'anio', label: 'Año', kind: 'number', required: true, min: 2000, max: 2100 },
+      { key: 'cliente', label: 'Cliente (ficticio)', kind: 'string', required: false },
+      { key: 'portada', label: 'Portada', kind: 'image', required: false },
+      { key: 'descripcion', label: 'Descripción', kind: 'richtext', required: false },
+    ],
+  },
+  {
+    id: 'pagina', name: 'Página', plural: 'Páginas', color: 'blue', titleField: 'titulo', version: 1,
+    fields: [
+      { key: 'titulo', label: 'Título', kind: 'string', required: true },
+      { key: 'cuerpo', label: 'Texto', kind: 'richtext', required: false },
+    ],
+  },
+];
+
+export function portfolioDocuments(): CmsDocument[] {
+  const projects: [string, number, string][] = [
+    ['Identidad para una panadería de barrio', 2025, 'Panadería El Trigo (ficticia)'],
+    ['Sitio web de un estudio de yoga', 2026, 'Estudio Calma (ficticio)'],
+    ['Catálogo de muebles en madera', 2026, ''],
+  ];
+  const docs = projects.map(([titulo, anio, cliente], i) => doc(`proyecto_${i + 1}`, 'proyecto', { titulo, anio, cliente, descripcion: `<p>${titulo}. Proyecto de ejemplo, datos ficticios.</p>` }, { daysAgo: 6 + i, published: i < 2 }));
+  docs.push(doc('pagina_1', 'pagina', { titulo: 'Sobre mí', cuerpo: '<p>Página de ejemplo del portafolio de prueba.</p>' }, { daysAgo: 12, published: true }));
+  return docs;
+}
+
+export interface SeedSite { id: string; name: string; types: ContentType[]; documents: () => CmsDocument[] }
+export const SEED_SITES: SeedSite[] = [
+  { id: 'portal-prueba', name: 'Portal inmobiliario (prueba)', types: SEED_TYPES, documents: seedDocuments },
+  { id: 'portafolio-prueba', name: 'Portafolio (prueba)', types: PORTFOLIO_TYPES, documents: portfolioDocuments },
+];

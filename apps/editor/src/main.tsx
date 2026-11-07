@@ -1,10 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 import './styles/app.css';
-import { StoreContext } from './data/hooks';
-import { LocalStore } from './data/local-store';
-import { ApiStore } from './data/api-store';
+import { SitesProvider } from './data/sites';
+import { FirstType } from './routes/FirstType';
 import { ToastProvider } from './components/ui';
 import { Shell } from './routes/Shell';
 import { ContentPage } from './routes/ContentPage';
@@ -17,16 +16,15 @@ try {
   if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
 } catch { /* sin almacenamiento */ }
 
-// VITE_DATA_SOURCE=api usa el API (apps/api + Neon); cualquier otro valor guarda en este navegador.
-export const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE === 'api' ? 'api' : 'local';
-const store = DATA_SOURCE === 'api' ? new ApiStore() : new LocalStore();
+// VITE_DATA_SOURCE=api usa el API (apps/api + Neon, varios sitios); cualquier otro valor guarda en este navegador.
+const USE_API = import.meta.env.VITE_DATA_SOURCE === 'api';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Shell />,
     children: [
-      { index: true, element: <Navigate to="/c/propiedad" replace /> },
+      { index: true, element: <FirstType /> },
       { path: 'c/:typeId', element: <ContentPage /> },
       { path: 'c/:typeId/:docId', element: <ContentPage /> },
       { path: 'modelos', element: <ModelsPage /> },
@@ -38,10 +36,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <StoreContext.Provider value={store}>
-      <ToastProvider>
+    <ToastProvider>
+      <SitesProvider api={USE_API}>
         <RouterProvider router={router} />
-      </ToastProvider>
-    </StoreContext.Provider>
+      </SitesProvider>
+    </ToastProvider>
   </StrictMode>,
 );

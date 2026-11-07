@@ -324,3 +324,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .img-side .label { font-weight: 700; margin-top: var(--cms-space-2); }
 .listing .photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--cms-radius-md); }
 @media (max-width: 899px) { .img-field { grid-template-columns: 1fr; } }
+
+/* Selector de sitios */
+.project { background: none; border: 0; cursor: pointer; transition: background-color var(--cms-duration-fast) var(--cms-ease); outline: none; }
+.project:hover, .project[data-pressed], .project[data-focus-visible] { background: var(--cms-color-shell-raised); }
+.project[data-focus-visible] { outline: 2px solid var(--cms-color-focus); outline-offset: 2px; }
+.site-dot { width: 24px; height: 24px; border-radius: var(--cms-radius-sm); display: inline-grid; place-items: center; background: var(--cms-color-accent); color: var(--cms-color-on-accent); font-size: var(--cms-text-xs); font-weight: 800; flex: none; }
+.menu-sep { height: 1px; background: var(--cms-color-border); margin: 6px 4px; }

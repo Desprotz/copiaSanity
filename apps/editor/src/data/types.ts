@@ -34,6 +34,9 @@ export interface ContentType {
   version: number;
 }
 
+/** Una web administrada desde el CMS (propia o de un cliente). */
+export interface Site { id: string; name: string; createdAt: string }
+
 export type DocData = Record<string, unknown>;
 
 export interface CmsDocument {

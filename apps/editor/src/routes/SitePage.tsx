@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { formatTime } from '../data/domain';
 import { useLive } from '../data/hooks';
+import { useSites } from '../data/sites';
 import type { ImageValue, SiteSnapshot } from '../data/types';
 import { StoredImage } from '../components/Fields';
 
@@ -24,8 +25,9 @@ function nameOf(snap: SiteSnapshot, id: unknown, field: string) {
 }
 
 export function SitePage() {
+  const { site } = useSites();
   const { data: snap } = useLive((s) => s.siteSnapshot(), []);
-  useEffect(() => { document.title = 'Portal de prueba'; }, []);
+  useEffect(() => { document.title = site?.name ?? 'Sitio'; }, [site?.name]);
   if (snap === undefined) return <div className="site"><div className="site-main"><div className="skeleton" /></div></div>;
   if (!snap) return <div className="site"><div className="site-main"><h1>El sitio todavía no se ha compilado.</h1></div></div>;
 
@@ -34,7 +36,7 @@ export function SitePage() {
   return (
     <div className="site">
       <header className="site-bar">
-        <strong>Portal de prueba</strong>
+        <strong>{site?.name}</strong>
         <span className="note mono">compilado {formatTime(snap.builtAt)} · datos ficticios</span>
       </header>
       <main className="site-main">

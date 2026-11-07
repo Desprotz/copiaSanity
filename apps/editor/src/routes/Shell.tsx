@@ -1,4 +1,6 @@
-import { ChevronDown, Moon, Sun, User } from 'lucide-react';
+import { Check, ChevronDown, Moon, Plus, Sun, User } from 'lucide-react';
+import { Button, Dialog, Heading, Menu, MenuItem, MenuTrigger, Modal, ModalOverlay, Popover, Separator } from 'react-aria-components';
+import { useSites } from '../data/sites';
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router';
 import { formatTime } from '../data/domain';
@@ -33,6 +35,65 @@ export function SiteBeacon() {
   );
 }
 
+function SiteSwitcher() {
+  const { sites, site, multi, select, create } = useSites();
+  const navigate = useNavigate();
+  const toast = useToast();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  const env = multi ? 'Neon' : 'este navegador';
+  const go = (id: string) => { if (id !== site?.id) { select(id); navigate('/'); } };
+  const submit = async () => {
+    if (!name.trim()) { setErr('Escribe el nombre de la web, por ejemplo «Panadería El Trigo».'); return; }
+    setBusy(true);
+    try { const s = await create(name); setOpen(false); setName(''); setErr(''); navigate('/'); toast(`Sitio «${s.name}» creado. Empieza definiendo sus tipos de contenido.`); }
+    catch (e) { setErr((e as Error).message); }
+    finally { setBusy(false); }
+  };
+  return (
+    <>
+      <MenuTrigger>
+        <Button className="project" aria-label={`Sitio actual: ${site?.name ?? ''}. Cambiar de sitio`}>
+          <strong>{site?.name}</strong><span className="env" title={multi ? 'Datos en la base de Neon' : 'Datos guardados solo en este navegador'}>{env}</span><ChevronDown className="lucide" aria-hidden="true" />
+        </Button>
+        <Popover placement="bottom start" offset={6}>
+          <Menu className="menu-pop" aria-label="Tus sitios" onAction={(key) => { if (key === '__new') setOpen(true); else go(String(key)); }}>
+            {sites.map((s) => (
+              <MenuItem key={s.id} id={s.id} className="menu-item" textValue={s.name}>
+                <span className="site-dot" aria-hidden="true">{s.name.slice(0, 1).toUpperCase()}</span>{s.name}
+                {s.id === site?.id && <Check className="lucide" aria-label="actual" style={{ marginLeft: 'auto' }} />}
+              </MenuItem>
+            ))}
+            {multi && <Separator className="menu-sep" />}
+            {multi && <MenuItem id="__new" className="menu-item" textValue="Nuevo sitio"><Plus className="lucide" aria-hidden="true" />Nuevo sitio…</MenuItem>}
+          </Menu>
+        </Popover>
+      </MenuTrigger>
+      <ModalOverlay className="overlay" isOpen={open} onOpenChange={setOpen} isDismissable>
+        <Modal>
+          <Dialog className="dialog">
+            <Heading slot="title">Nuevo sitio</Heading>
+            <p className="muted">Cada sitio es una web con sus propios tipos de contenido, documentos y fotos. Lo de un sitio nunca aparece en otro.</p>
+            <form onSubmit={(e) => { e.preventDefault(); void submit(); }}>
+              <div className="field" style={{ marginTop: 'var(--cms-space-5)' }}>
+                <label htmlFor="site-name">Nombre de la web</label>
+                <div className="control"><input id="site-name" autoFocus value={name} placeholder="Ej.: Panadería El Trigo" maxLength={80} onChange={(e) => setName(e.target.value)} /></div>
+                {err && <span className="err" role="alert">{err}</span>}
+              </div>
+              <div className="acts">
+                <button className="btn btn-ghost" type="button" onClick={() => setOpen(false)}>Cancelar</button>
+                <button className="btn btn-primary" type="submit" disabled={busy}>{busy ? <span className="spinner" aria-hidden="true" /> : null}Crear sitio</button>
+              </div>
+            </form>
+          </Dialog>
+        </Modal>
+      </ModalOverlay>
+    </>
+  );
+}
+
 export function Shell() {
   const store = useStore();
   const navigate = useNavigate();
@@ -54,7 +115,7 @@ export function Shell() {
     if (!window.confirm('¿Volver a los datos de prueba? Se pierden los cambios hechos en este navegador.')) return;
     await store.resetDemo();
     toast('Datos de prueba restaurados.');
-    navigate('/c/propiedad');
+    navigate('/');
   };
 
   return (
@@ -62,7 +123,7 @@ export function Shell() {
       <a className="skip" href="#main">Saltar al contenido</a>
       <header className="topbar">
         <img className="logo" src="/logo-mse-blanco.svg" alt="MSE" width={81} height={22} />
-        <span className="project"><strong>Portal de prueba</strong><span className="env" title={import.meta.env.VITE_DATA_SOURCE === 'api' ? 'Datos en la base de Neon' : 'Datos guardados solo en este navegador'}>{import.meta.env.VITE_DATA_SOURCE === 'api' ? 'Neon' : 'este navegador'}</span><ChevronDown className="lucide" aria-hidden="true" /></span>
+        <SiteSwitcher />
         <SiteBeacon />
         <button className="icon-btn" type="button" onClick={toggleTheme} aria-label={dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}>
           {dark ? <Sun className="lucide" /> : <Moon className="lucide" />}

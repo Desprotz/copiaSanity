@@ -1,5 +1,18 @@
 import type { ContentStore } from './store';
-import { ConflictError, type Asset, type CmsDocument, type ContentType, type DocData, type SiteSnapshot, type SiteStatus } from './types';
+import { ConflictError, type Asset, type CmsDocument, type ContentType, type DocData, type Site, type SiteSnapshot, type SiteStatus } from './types';
+
+async function call<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch('/api/v1' + path, { ...init, headers: { 'content-type': 'application/json' }, credentials: 'same-origin' }).catch(() => { throw new Error('Sin conexión con el servidor.'); });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(typeof body.error === 'string' ? body.error : `El servidor respondió ${res.status}.`);
+  return body as T;
+}
+
+/** Sitios: fuera del contrato de contenido porque no pertenecen a ningún sitio. */
+export const sitesApi = {
+  list: () => call<Site[]>('/sites'),
+  create: (id: string, name: string) => call<Site>('/sites', { method: 'POST', body: JSON.stringify({ id, name }) }),
+};
 
 /**
  * Capa de datos contra el API propio (apps/api: Hono en Cloudflare Workers + Neon).
@@ -10,7 +23,10 @@ export class ApiStore implements ContentStore {
   private seq = -1;
   private timer: ReturnType<typeof setInterval> | undefined;
 
-  constructor(private base = '/api/v1') {
+  private base: string;
+
+  constructor(site: string) {
+    this.base = `/api/v1/s/${encodeURIComponent(site)}`;
     // Avisos de cambios: consulta barata cada 3 s mientras la pestaña está visible (también hace avanzar la compilación agrupada).
     const tick = () => { if (document.visibilityState === 'visible') void this.poll(); };
     this.timer = setInterval(tick, 3000);

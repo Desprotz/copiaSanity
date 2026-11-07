@@ -32,7 +32,7 @@ export function ContentPage() {
   }, [docs, type, query, filter, site?.lastBuiltAt]);
 
   if (types && !type) {
-    return <main className="editor" id="main"><div className="editor-inner"><div className="empty"><strong>Este tipo de contenido no existe.</strong><Link className="btn btn-secondary" to="/c/propiedad">Ir a Propiedades</Link></div></div></main>;
+    return <main className="editor" id="main"><div className="editor-inner"><div className="empty"><strong>Este tipo de contenido no existe.</strong><Link className="btn btn-secondary" to="/">Ir al inicio del sitio</Link></div></div></main>;
   }
 
   const create = async () => {
