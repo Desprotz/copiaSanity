@@ -1,0 +1,12 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "cms-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Barrido de publicaciones programadas y compilación agrupada (architecture.md: cada 5 min).
+  "triggers": { "crons": ["*/5 * * * *"] },
+  "vars": { "BUILD_BATCH_SECONDS": "300" },
+  "observability": { "enabled": true }
+  // Al desplegar (replica-deploy): binding de Hyperdrive hacia Neon, R2 para imágenes y Access.
+}

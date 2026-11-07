@@ -1,10 +1,14 @@
 {
   "name": "copiasanity",
   "private": true,
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "dev": "npm run dev -w apps/editor",
     "build": "npm run build -w apps/editor",
-    "typecheck": "npm run typecheck -w apps/editor"
+    "typecheck": "npm run typecheck -w apps/editor && npm run typecheck -w apps/api",
+    "dev:api": "npm run dev -w apps/api",
+    "migrate": "npm run migrate -w apps/api"
   }
 }

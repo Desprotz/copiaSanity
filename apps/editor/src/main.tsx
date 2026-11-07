@@ -4,6 +4,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import './styles/app.css';
 import { StoreContext } from './data/hooks';
 import { LocalStore } from './data/local-store';
+import { ApiStore } from './data/api-store';
 import { ToastProvider } from './components/ui';
 import { Shell } from './routes/Shell';
 import { ContentPage } from './routes/ContentPage';
@@ -16,7 +17,9 @@ try {
   if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
 } catch { /* sin almacenamiento */ }
 
-const store = new LocalStore();
+// VITE_DATA_SOURCE=api usa el API (apps/api + Neon); cualquier otro valor guarda en este navegador.
+export const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE === 'api' ? 'api' : 'local';
+const store = DATA_SOURCE === 'api' ? new ApiStore() : new LocalStore();
 
 const router = createBrowserRouter([
   {

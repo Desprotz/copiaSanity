@@ -1,0 +1,9 @@
+# Copia este archivo como .dev.vars (sin .example) y pega tu cadena de conexión de Neon.
+# .dev.vars está excluido de git: nunca se sube a GitHub.
+# En Neon: Dashboard > Connect > desmarca "Connection pooling" y copia la cadena completa.
+DATABASE_URL=postgresql://USUARIO:CONTRASEÑA@HOST.neon.tech/neondb?sslmode=require
+# Solo para desarrollo local: sin Cloudflare Access, el API usa un usuario de prueba.
+# Nunca pongas DEV_AUTH en producción: sin esta variable el API exige Access y niega todo lo demás.
+DEV_AUTH=1
+# Segundos que espera la compilación agrupada del sitio (en producción, 300).
+BUILD_BATCH_SECONDS=6

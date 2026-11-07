@@ -62,7 +62,7 @@ export function Shell() {
       <a className="skip" href="#main">Saltar al contenido</a>
       <header className="topbar">
         <img className="logo" src="/logo-mse-blanco.svg" alt="MSE" width={81} height={22} />
-        <span className="project"><strong>Portal de prueba</strong><span className="env">local</span><ChevronDown className="lucide" aria-hidden="true" /></span>
+        <span className="project"><strong>Portal de prueba</strong><span className="env" title={import.meta.env.VITE_DATA_SOURCE === 'api' ? 'Datos en la base de Neon' : 'Datos guardados solo en este navegador'}>{import.meta.env.VITE_DATA_SOURCE === 'api' ? 'Neon' : 'este navegador'}</span><ChevronDown className="lucide" aria-hidden="true" /></span>
         <SiteBeacon />
         <button className="icon-btn" type="button" onClick={toggleTheme} aria-label={dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}>
           {dark ? <Sun className="lucide" /> : <Moon className="lucide" />}

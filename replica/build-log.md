@@ -2,9 +2,9 @@
 
 Código en `apps/editor` (React 19 + TypeScript 7 + Vite 8, React Router 8, React Aria Components, Tiptap 3, Tailwind 4, Lucide, fuentes Overpass servidas desde el proyecto). Todo escrito desde cero a partir de recon.md, architecture.md y el sistema de diseño; nada de código, textos ni recursos de Sanity.
 
-**Capa de datos:** `src/data/store.ts` define el contrato (las mismas operaciones de api.md). `local-store.ts` lo implementa en el navegador (localStorage) con datos ficticios. replica-backend añadirá la implementación contra el API (Hono en Cloudflare + Neon) sin cambiar pantallas.
+**Capa de datos:** `src/data/store.ts` define el contrato. `api-store.ts` lo implementa contra el API (`apps/api`, Neon) y es la que se usa en desarrollo (`.env.development`); `local-store.ts` queda como modo sin conexión (`VITE_DATA_SOURCE=local`). Detalle del backend en `backend.md`.
 
-Cómo probar: `npm run dev` en la raíz y abrir http://localhost:5173. «Restaurar datos de prueba» (abajo en el menú lateral) vuelve al estado inicial.
+Cómo probar: `npm run dev:api` y `npm run dev` en la raíz, y abrir http://localhost:5173. «Restaurar datos de prueba» (abajo en el menú lateral) vuelve al estado inicial en Neon.
 
 | Pantalla | Fecha | Estado | Falta | Más difícil de lo esperado |
 |---|---|---|---|---|
@@ -30,6 +30,10 @@ Cómo probar: `npm run dev` en la raíz y abrir http://localhost:5173. «Restaur
 
 - **Publicaba «solo»:** el botón decía «Falta: X» y llevaba al campo; al completarlo, el mismo botón se convertía en «Publicar», así que un segundo clic publicaba sin querer. Ahora «Publicar» nunca cambia de función (desactivado mientras falte algo) y «Falta: X» es un enlace aparte debajo. La estación «Publicado» ya no se ilumina antes de pulsar: queda gris con «pulsa Publicar».
 - **Faltaba la foto:** campo de imagen con arrastrar/elegir, optimización a WebP en el navegador (prueba: 165 KB → 17 KB), descripción obligatoria para publicar y foto visible en el sitio.
+
+## Backend conectado (2026-11-07)
+
+Mismo recorrido repetido contra Neon: completar Habitaciones, subir foto (guardada en Neon, 16 KB), describirla, publicar, compilación agrupada y `/sitio` con la foto. Verificado también consultando la base: documento publicado sin borrador, historial `create` → `publish`, auditoría y foto del sitio. Cada consulta tarda ~1 s en local (conexión nueva hasta Virginia); en producción lo resuelve Hyperdrive.
 
 ## Notas
 

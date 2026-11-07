@@ -5,5 +5,11 @@ dist/
 .env
 .env.*
 !.env.example
+# Configuración de desarrollo sin secretos (origen de datos del editor)
+!.env.development
 .impeccable/serve-start.log
 .impeccable/brief-body.md
+
+# Secretos locales del API (Wrangler)
+.dev.vars
+.wrangler/
