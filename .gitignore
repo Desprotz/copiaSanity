@@ -18,3 +18,5 @@ dist/
 
 # Guía de traspaso: se entrega aparte, no va al repositorio
 ENTREGA.md
+# Guía con secretos: solo para el dueño, nunca al repositorio
+ENTREGA-PRIVADO.md
