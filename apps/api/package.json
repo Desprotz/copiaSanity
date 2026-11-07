@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev --port 8787",
+    "dev": "node scripts/dev.mjs",
     "migrate": "node scripts/migrate.mjs",
     "typecheck": "tsc --noEmit",
     "user": "node scripts/create-user.mjs"
