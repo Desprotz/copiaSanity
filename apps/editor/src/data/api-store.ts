@@ -13,6 +13,7 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 export const sitesApi = {
   list: () => call<Site[]>('/sites'),
   create: (id: string, name: string) => call<Site>('/sites', { method: 'POST', body: JSON.stringify({ id, name }) }),
+  remove: async (id: string, confirm: string) => { await call<unknown>(`/sites/${encodeURIComponent(id)}`, { method: 'DELETE', body: JSON.stringify({ confirm }) }); },
 };
 
 /**

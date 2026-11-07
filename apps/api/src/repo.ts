@@ -61,6 +61,15 @@ export async function createSite(sql: Sql, id: string, name: string, actor: stri
   });
 }
 
+/** Borra el sitio y, en cascada, sus tipos, documentos, historial, imágenes y compilaciones. */
+export async function deleteSite(sql: Sql, id: string, actor: string) {
+  await sql.begin(async (tx) => {
+    const [r] = await tx`delete from cms.sites where id = ${id} returning id`;
+    if (!r) throw new HttpError(404, 'Ese sitio no existe.');
+    await tx`insert into cms.audit_events (site_id, actor, action, target) values (null, ${actor}, 'site.delete', ${id})`;
+  });
+}
+
 // ---------- Datos de prueba ----------
 
 async function seedSite(tx: TransactionSql, s: (typeof SEED_SITES)[number], actor: string) {

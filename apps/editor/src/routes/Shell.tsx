@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Moon, Plus, Sun, User } from 'lucide-react';
+import { Check, ChevronDown, Moon, Plus, Sun, Trash2, User } from 'lucide-react';
 import { Button, Dialog, Heading, Menu, MenuItem, MenuTrigger, Modal, ModalOverlay, Popover, Separator } from 'react-aria-components';
 import { useSites } from '../data/sites';
 import { useAuth } from './Login';
@@ -42,7 +42,12 @@ export function SiteBeacon() {
 }
 
 function SiteSwitcher() {
-  const { sites, site, multi, select, create } = useSites();
+  const { sites, site, multi, select, create, remove } = useSites();
+  const auth = useAuth();
+  const [delOpen, setDelOpen] = useState(false);
+  const [delName, setDelName] = useState('');
+  const [delErr, setDelErr] = useState('');
+  const [delBusy, setDelBusy] = useState(false);
   const navigate = useNavigate();
   const toast = useToast();
   const [open, setOpen] = useState(false);
@@ -65,7 +70,7 @@ function SiteSwitcher() {
           <strong>{site?.name}</strong><span className="env" title={multi ? 'Datos en la base de Neon' : 'Datos guardados solo en este navegador'}>{env}</span><ChevronDown className="lucide" aria-hidden="true" />
         </Button>
         <Popover placement="bottom start" offset={6}>
-          <Menu className="menu-pop" aria-label="Tus sitios" onAction={(key) => { if (key === '__new') setOpen(true); else go(String(key)); }}>
+          <Menu className="menu-pop" aria-label="Tus sitios" onAction={(key) => { if (key === '__new') setOpen(true); else if (key === '__del') { setDelName(''); setDelErr(''); setDelOpen(true); } else go(String(key)); }}>
             {sites.map((s) => (
               <MenuItem key={s.id} id={s.id} className="menu-item" textValue={s.name}>
                 <span className="site-dot" aria-hidden="true">{s.name.slice(0, 1).toUpperCase()}</span>{s.name}
@@ -74,9 +79,36 @@ function SiteSwitcher() {
             ))}
             {multi && <Separator className="menu-sep" />}
             {multi && <MenuItem id="__new" className="menu-item" textValue="Nuevo sitio"><Plus className="lucide" aria-hidden="true" />Nuevo sitio…</MenuItem>}
+            {multi && auth?.me.isOwner && site && <MenuItem id="__del" className="menu-item danger" textValue="Eliminar este sitio"><Trash2 className="lucide" aria-hidden="true" />Eliminar «{site.name}»…</MenuItem>}
           </Menu>
         </Popover>
       </MenuTrigger>
+      <ModalOverlay className="overlay" isOpen={delOpen} onOpenChange={setDelOpen} isDismissable={!delBusy}>
+        <Modal>
+          <Dialog className="dialog" role="alertdialog">
+            <Heading slot="title">¿Eliminar «{site?.name}»?</Heading>
+            <p className="muted">Se borran para siempre sus tipos de contenido, documentos, fotos, historial y compilaciones. Su web pública dejará de mostrar contenido. <strong>No se puede deshacer.</strong></p>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (!site || delName.trim() !== site.name) return;
+              setDelBusy(true); setDelErr('');
+              try { const name = site.name; await remove(site.id, delName); setDelOpen(false); navigate('/'); toast(`Sitio «${name}» eliminado.`); }
+              catch (err) { setDelErr((err as Error).message); }
+              finally { setDelBusy(false); }
+            }}>
+              <div className="field" style={{ marginTop: 'var(--cms-space-5)' }}>
+                <label htmlFor="del-name">Para confirmar, escribe el nombre del sitio: <strong>{site?.name}</strong></label>
+                <div className="control"><input id="del-name" autoFocus autoComplete="off" value={delName} onChange={(e) => setDelName(e.target.value)} /></div>
+                {delErr && <span className="err" role="alert">{delErr}</span>}
+              </div>
+              <div className="acts">
+                <button className="btn btn-ghost" type="button" onClick={() => setDelOpen(false)} disabled={delBusy}>Cancelar</button>
+                <button className="btn btn-danger" type="submit" disabled={delBusy || delName.trim() !== site?.name}>{delBusy ? <span className="spinner" aria-hidden="true" /> : null}Eliminar sitio</button>
+              </div>
+            </form>
+          </Dialog>
+        </Modal>
+      </ModalOverlay>
       <ModalOverlay className="overlay" isOpen={open} onOpenChange={setOpen} isDismissable>
         <Modal>
           <Dialog className="dialog">

@@ -12,6 +12,7 @@ interface SitesValue {
   multi: boolean;
   select: (id: string) => void;
   create: (name: string) => Promise<Site>;
+  remove: (id: string, confirm: string) => Promise<void>;
 }
 
 const SitesContext = createContext<SitesValue | null>(null);
@@ -55,7 +56,13 @@ export function SitesProvider({ api, children }: { api: boolean; children: React
     return s;
   }, [sites, load, select]);
 
-  const value = useMemo(() => ({ sites, site, multi: api, select, create }), [sites, site, api, select, create]);
+  const remove = useCallback(async (id: string, confirm: string) => {
+    await sitesApi.remove(id, confirm);
+    if (id === site?.id) { setSiteId(null); try { localStorage.removeItem(KEY); } catch { /* sin almacenamiento */ } }
+    await load();
+  }, [site?.id, load]);
+
+  const value = useMemo(() => ({ sites, site, multi: api, select, create, remove }), [sites, site, api, select, create, remove]);
 
   if (error) return <div className="empty" style={{ paddingTop: 96 }}><strong>No se pudo conectar con el API</strong><span>{error}</span><span className="muted">¿Está corriendo <code>npm run dev:api</code>?</span><button className="btn btn-secondary" type="button" onClick={() => void load()}>Reintentar</button></div>;
   if (!store || !site) return <div className="empty" style={{ paddingTop: 96 }} aria-busy="true"><span className="spinner" aria-hidden="true" /><span>Cargando tus sitios…</span></div>;

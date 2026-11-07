@@ -154,6 +154,26 @@ app.post('/sites', async (c) => {
   return c.json(await repo.createSite(c.var.sql, id, name, c.var.actor), 201);
 });
 
+app.delete('/sites/:id', async (c) => {
+  if (!c.var.user.isOwner) throw new HttpError(403, 'Solo el dueño de la cuenta puede eliminar sitios.');
+  const id = siteId.parse(c.req.param('id'));
+  const { confirm } = await body(c, z.object({ confirm: z.string() }));
+  const [s] = await c.var.sql`select name from cms.sites where id = ${id}`;
+  if (!s) throw new HttpError(404, 'Ese sitio no existe.');
+  // Segunda comprobación en el servidor: hay que escribir el nombre exacto.
+  if (confirm.trim() !== String(s.name)) throw new HttpError(422, 'El nombre escrito no coincide con el del sitio.');
+  await repo.deleteSite(c.var.sql, id, c.var.actor);
+  if (c.env.FLAGS) {
+    let cursor: string | undefined;
+    do {
+      const page = await c.env.FLAGS.list({ prefix: `pub:${id}:`, cursor });
+      await Promise.all(page.keys.map((k) => c.env.FLAGS!.delete(k.name)));
+      cursor = page.list_complete ? undefined : page.cursor;
+    } while (cursor);
+  }
+  return c.body(null, 204);
+});
+
 // Todo lo demás pertenece a un sitio: se comprueba que existe y cada consulta lleva su id.
 app.use('/s/:site/*', async (c, next) => {
   const site = siteId.parse(c.req.param('site'));
