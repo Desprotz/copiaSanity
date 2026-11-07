@@ -8,6 +8,18 @@
         "value": "archivo",
         "createdAt": "2026-11-07T11:10:42.163Z",
         "reason": "Claude: Archivo es la tipografía de la tienda de prueba Telar Norte (web de cliente con identidad propia); DESIGN.md describe solo el editor del CMS"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "bodoni moda",
+        "createdAt": "2026-11-07T11:24:34.967Z",
+        "reason": "Claude: tipografía propia de la web de cliente Viña Sotará; DESIGN.md describe solo el editor"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "hanken grotesk",
+        "createdAt": "2026-11-07T11:24:35.284Z",
+        "reason": "Claude: tipografía propia de la web de cliente Viña Sotará; DESIGN.md describe solo el editor"
       }
     ]
   }
