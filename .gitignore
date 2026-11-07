@@ -7,6 +7,7 @@ dist/
 !.env.example
 # Configuración de desarrollo sin secretos (origen de datos del editor)
 !.env.development
+!.env.production
 .impeccable/serve-start.log
 .impeccable/brief-body.md
 

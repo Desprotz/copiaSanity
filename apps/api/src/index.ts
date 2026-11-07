@@ -13,6 +13,8 @@ export interface Env {
   /** Al desplegar: binding de Hyperdrive hacia Neon. */
   HYPERDRIVE?: { connectionString: string };
   BUILD_BATCH_SECONDS?: string;
+  /** Marca de compilación pendiente: el Cron la lee y solo abre Neon si toca compilar. */
+  FLAGS?: KVNamespace;
 }
 
 type Vars = { sql: Sql; actor: string; ctx: repo.Ctx; user: auth.SessionUser };
@@ -26,6 +28,14 @@ function connect(env: Env): Sql {
   const url = env.DATABASE_URL ?? env.HYPERDRIVE?.connectionString;
   if (!url) throw new HttpError(503, 'El API no tiene base de datos configurada.');
   return postgres(url, { max: 5, fetch_types: false, onnotice: () => {} });
+}
+
+/** Anota en KV cuándo vence la próxima compilación (no se gasta Neon en revisarlo cada 5 minutos). */
+async function flagBuild(env: Env) {
+  if (!env.FLAGS) return;
+  const at = Date.now() + batch(env) * 1000;
+  const prev = Number(await env.FLAGS.get('build-due'));
+  if (!prev || at < prev) await env.FLAGS.put('build-due', String(at));
 }
 
 const batch = (env: Env) => Math.max(1, Math.min(3600, Number(env.BUILD_BATCH_SECONDS ?? 300) || 300));
@@ -163,12 +173,14 @@ app.patch('/s/:site/documents/:id/draft', async (c) => {
 });
 app.post('/s/:site/documents/:id/publish', async (c) => {
   const { rev } = await body(c, withRev);
-  return c.json(await repo.publish(c.var.sql, c.var.ctx, param(c, 'id'), rev));
+  const d = await repo.publish(c.var.sql, c.var.ctx, param(c, 'id'), rev);
+  await flagBuild(c.env);
+  return c.json(d);
 });
 app.post('/s/:site/documents/:id/discard', async (c) => c.json(await repo.discardDraft(c.var.sql, c.var.ctx, param(c, 'id'))));
-app.post('/s/:site/documents/:id/unpublish', async (c) => c.json(await repo.unpublish(c.var.sql, c.var.ctx, param(c, 'id'))));
+app.post('/s/:site/documents/:id/unpublish', async (c) => { const d = await repo.unpublish(c.var.sql, c.var.ctx, param(c, 'id')); await flagBuild(c.env); return c.json(d); });
 app.post('/s/:site/documents/:id/duplicate', async (c) => c.json(await repo.duplicate(c.var.sql, c.var.ctx, param(c, 'id')), 201));
-app.delete('/s/:site/documents/:id', async (c) => { await repo.deleteDocument(c.var.sql, c.var.ctx, param(c, 'id')); return c.body(null, 204); });
+app.delete('/s/:site/documents/:id', async (c) => { await repo.deleteDocument(c.var.sql, c.var.ctx, param(c, 'id')); await flagBuild(c.env); return c.body(null, 204); });
 
 const MAGIC: Record<string, (b: Uint8Array) => boolean> = {
   'image/webp': (b) => b.length > 12 && String.fromCharCode(...b.slice(0, 4)) === 'RIFF' && String.fromCharCode(...b.slice(8, 12)) === 'WEBP',
@@ -209,7 +221,17 @@ export default {
   fetch: app.fetch,
   // Cron Trigger: compila el sitio si hay publicaciones esperando (architecture.md, «Programación sin gastar la base»).
   async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext) {
+    // Primero KV (gratis y sin despertar Neon). Solo si hay una compilación vencida se abre la base.
+    const due = Number(await env.FLAGS?.get('build-due'));
+    if (env.FLAGS && (!due || due > Date.now())) return;
     const sql = connect(env);
-    ctx.waitUntil(repo.maybeBuild(sql).finally(() => sql.end({ timeout: 5 })));
+    ctx.waitUntil((async () => {
+      try {
+        await repo.maybeBuild(sql);
+        const [{ n }] = await sql`select count(*)::int as n from cms.site_state where pending > 0`;
+        if (n === 0) await env.FLAGS?.delete('build-due');
+        else await env.FLAGS?.put('build-due', String(Date.now() + 60_000));
+      } finally { await sql.end({ timeout: 5 }); }
+    })());
   },
 } satisfies ExportedHandler<Env>;

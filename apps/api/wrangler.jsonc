@@ -8,6 +8,8 @@
   "triggers": { "crons": ["*/5 * * * *"] },
   "vars": { "BUILD_BATCH_SECONDS": "300" },
   "observability": { "enabled": true },
+  // El mismo Worker sirve el editor (estáticos compilados) y el API: una sola dirección, sin CORS.
+  "assets": { "directory": "../editor/dist", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
   // Ids de recursos de la cuenta (no son secretos). La contraseña de Neon vive solo dentro de Hyperdrive.
   "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "8def0a1b64ec4b9195d7309eb7078d23" }],
   "kv_namespaces": [{ "binding": "FLAGS", "id": "bc1afd8d333341dd9a8a6a6106a9eb4b" }]

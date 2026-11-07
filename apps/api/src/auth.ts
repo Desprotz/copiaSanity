@@ -3,8 +3,7 @@ import { HttpError } from './repo';
 
 type Sql = postgres.Sql;
 
-// Formato del hash: pbkdf2-sha256$<iteraciones>$<sal base64>$<hash base64>. Lo genera scripts/create-user.mjs con los mismos parámetros.
-const ITERATIONS = 100_000; // máximo que admite WebCrypto en Workers
+// Contraseñas con bcrypt (pgcrypto) calculado dentro de Postgres: así el Worker no gasta su CPU (10 ms en el plan gratuito).
 export const SESSION_DAYS = 14;
 export const COOKIE = 'cms_session';
 const MAX_FAILS = 5;
@@ -12,30 +11,6 @@ const WINDOW_MIN = 15;
 
 const enc = new TextEncoder();
 const b64 = (u: Uint8Array) => btoa(String.fromCharCode(...u));
-const unb64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
-
-async function pbkdf2(password: string, salt: Uint8Array, iterations: number) {
-  const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
-  return new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations }, key, 256));
-}
-
-function sameBytes(a: Uint8Array, b: Uint8Array) {
-  if (a.length !== b.length) return false;
-  let d = 0;
-  for (let i = 0; i < a.length; i++) d |= a[i] ^ b[i];
-  return d === 0;
-}
-
-export async function verifyPassword(password: string, stored: string) {
-  const [alg, iter, salt, hash] = stored.split('$');
-  if (alg !== 'pbkdf2-sha256' || !iter || !salt || !hash) return false;
-  const n = Number(iter);
-  if (!Number.isInteger(n) || n < 10_000 || n > ITERATIONS) return false;
-  return sameBytes(await pbkdf2(password, unb64(salt), n), unb64(hash));
-}
-
-/** Hash ficticio para que un usuario inexistente tarde lo mismo que uno real (no revela qué usuarios existen). */
-const DUMMY = `pbkdf2-sha256$${ITERATIONS}$${b64(new Uint8Array(16))}$${b64(new Uint8Array(32))}`;
 
 const sha256 = async (s: string) => b64(new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(s))));
 
@@ -46,8 +21,11 @@ export async function login(sql: Sql, username: string, password: string, ip: st
     where not ok and at > now() - make_interval(mins => ${WINDOW_MIN}) and (username = ${username} or ip = ${ip})`;
   if (fails >= MAX_FAILS) throw new HttpError(429, `Demasiados intentos fallidos. Espera ${WINDOW_MIN} minutos e inténtalo de nuevo.`);
 
-  const [u] = await sql`select * from cms.users where username = ${username} and disabled_at is null`;
-  const ok = await verifyPassword(password, (u?.password_hash as string) ?? DUMMY) && Boolean(u);
+  const [u] = await sql`select id, (password_hash = crypt(${password}, password_hash)) as ok
+    from cms.users where username = ${username} and disabled_at is null and password_hash like '$2%'`;
+  // Si el usuario no existe se calcula igual un bcrypt, para que la respuesta tarde lo mismo y no revele qué usuarios existen.
+  if (!u) await sql`select crypt(${password}, gen_salt('bf', 12))`;
+  const ok = Boolean(u?.ok);
   await sql`insert into cms.login_attempts (username, ip, ok) values (${username}, ${ip}, ${ok})`;
   await sql`delete from cms.login_attempts where at < now() - interval '7 days'`;
   if (!ok) throw new HttpError(401, 'Usuario o contraseña incorrectos.');
