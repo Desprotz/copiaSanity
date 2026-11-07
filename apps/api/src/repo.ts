@@ -2,7 +2,7 @@ import type postgres from 'postgres';
 // Dominio compartido con el editor: la misma validación corre en el navegador y aquí (la de aquí es la que manda).
 import { newId, validate } from '../../editor/src/data/domain';
 import { SEED_SITES } from '../../editor/src/data/seed';
-import type { Asset, CmsDocument, ContentType, DocData, Site, SiteSnapshot, SiteStatus } from '../../editor/src/data/types';
+import type { Asset, CmsDocument, ContentType, DocData, ImportBatch, ImportResult, Site, SiteSnapshot, SiteStatus } from '../../editor/src/data/types';
 
 type Sql = postgres.Sql;
 type TransactionSql = postgres.TransactionSql;
@@ -238,6 +238,53 @@ export async function duplicate(sql: Sql, c: Ctx, id: string) {
     await tx`insert into cms.revisions (site_id, document_id, rev, action, data) values (${c.site}, ${newDocId}, 1, 'duplicate', ${tx.json(data as never)})`;
     await bump(tx, c); await audit(tx, c, 'doc.duplicate', newDocId, { from: id });
     return toDoc(r);
+  });
+}
+
+// ---------- Importación (Strapi, JSON, CSV) ----------
+
+/**
+ * Guarda un lote importado en una sola transacción: crea o amplía los tipos e inserta los documentos.
+ * Con publish, solo se publican los que pasan la misma validación que el botón Publicar; el resto queda en borrador.
+ * Los documentos se insertan con una sola consulta por tabla (la base está lejos: una consulta por fila sería lenta).
+ */
+export async function importContent(sql: Sql, c: Ctx, batch: ImportBatch): Promise<ImportResult> {
+  return sql.begin(async (tx) => {
+    for (const t of batch.types) {
+      await tx`insert into cms.content_types (site_id, id, name, plural, color, title_field, fields)
+        values (${c.site}, ${t.id}, ${t.name}, ${t.plural}, ${t.color}, ${t.titleField}, ${tx.json(t.fields as never)})
+        on conflict (site_id, id) do update set name = excluded.name, plural = excluded.plural, color = excluded.color,
+          title_field = excluded.title_field, fields = excluded.fields, version = cms.content_types.version + 1, updated_at = now()`;
+    }
+    const types = new Map((await tx`select * from cms.content_types where site_id = ${c.site}`).map((r) => [r.id as string, toType(r)]));
+    for (const t of batch.types) for (const f of t.fields) {
+      if (f.kind === 'reference' && f.refType && !types.has(f.refType)) throw new HttpError(422, `El campo «${f.label}» de «${t.name}» enlaza a un tipo que no existe en este sitio.`);
+    }
+
+    const rows = batch.documents.map((d) => {
+      const type = types.get(d.typeId);
+      if (!type) throw new HttpError(422, 'Un documento del lote apunta a un tipo que no existe en este sitio.');
+      return { id: d.id, typeId: d.typeId, data: d.data, live: d.publish && Object.keys(validate(type, d.data)).length === 0 };
+    });
+    if (rows.length) {
+      const [dup] = await tx`select id from cms.documents where site_id = ${c.site} and id in ${tx(rows.map((r) => r.id))} limit 1`;
+      if (dup) throw new HttpError(409, 'Parte de este lote ya se había importado. Vuelve a preparar la importación.');
+      const json = tx.json(rows as never);
+      await tx`insert into cms.documents (site_id, id, type_id, draft, published, rev, published_at)
+        select ${c.site}, x->>'id', x->>'typeId',
+          case when (x->>'live')::boolean then null else x->'data' end,
+          case when (x->>'live')::boolean then x->'data' end,
+          1, case when (x->>'live')::boolean then now() end
+        from jsonb_array_elements(${json}) x`;
+      await tx`insert into cms.revisions (site_id, document_id, rev, action, data)
+        select ${c.site}, x->>'id', 1, case when (x->>'live')::boolean then 'publish' else 'create' end, x->'data'
+        from jsonb_array_elements(${json}) x`;
+    }
+    const published = rows.filter((r) => r.live).length;
+    if (published) await markForBuild(tx, c);
+    await bump(tx, c);
+    await audit(tx, c, 'import', undefined, { types: batch.types.map((t) => t.id), created: rows.length, published });
+    return { types: batch.types.length, created: rows.length, published };
   });
 }
 

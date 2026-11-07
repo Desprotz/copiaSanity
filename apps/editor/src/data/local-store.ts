@@ -2,7 +2,7 @@ import { blobUrl, clearBlobs, putBlob } from './assets-db';
 import { newId, validate } from './domain';
 import { SEED_TYPES, seedDocuments } from './seed';
 import type { ContentStore } from './store';
-import { ConflictError, type Asset, type CmsDocument, type ContentType, type DocData, type SiteSnapshot, type SiteStatus } from './types';
+import { ConflictError, type Asset, type CmsDocument, type ContentType, type DocData, type ImportBatch, type ImportResult, type SiteSnapshot, type SiteStatus } from './types';
 
 const KEY = 'cms.local.v1';
 /** Las publicaciones se agrupan: la compilación espera este tiempo tras la última publicación. */
@@ -239,6 +239,31 @@ export class LocalStore implements ContentStore {
   async buildSiteNow() { clearTimeout(this.timer); await this.runBuild(); }
 
   async siteSnapshot() { return structuredClone(this.state.site.snapshot); }
+
+  async importContent(batch: ImportBatch): Promise<ImportResult> {
+    await delay();
+    for (const t of batch.types) {
+      const i = this.state.types.findIndex((x) => x.id === t.id);
+      const saved = { ...structuredClone(t), version: i >= 0 ? this.state.types[i].version + 1 : 1 };
+      if (i >= 0) this.state.types[i] = saved; else this.state.types.push(saved);
+    }
+    const now = new Date().toISOString();
+    let published = 0;
+    for (const d of batch.documents) {
+      const type = this.state.types.find((t) => t.id === d.typeId);
+      if (!type) throw new Error('Un documento del lote apunta a un tipo que no existe.');
+      if (this.state.documents.some((x) => x.id === d.id)) throw new Error('Un documento del lote ya existe. Vuelve a preparar la importación.');
+      const live = d.publish && Object.keys(validate(type, d.data)).length === 0;
+      if (live) published++;
+      this.state.documents.push({
+        id: d.id, typeId: d.typeId, draft: live ? null : structuredClone(d.data), published: live ? structuredClone(d.data) : null,
+        rev: 1, createdAt: now, updatedAt: now, publishedAt: live ? now : null,
+      });
+    }
+    if (published) this.markForBuild();
+    this.commit();
+    return { types: batch.types.length, created: batch.documents.length, published };
+  }
 
   async resetDemo() { clearTimeout(this.timer); await clearBlobs().catch(() => undefined); this.state = initialState(); this.commit(); }
 

@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowLeft, ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowUp, FileUp, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { newId, slugKey } from '../data/domain';
@@ -6,7 +6,7 @@ import { useLive, useStore } from '../data/hooks';
 import type { ContentType, FieldDef, FieldKind, LineColor } from '../data/types';
 import { LINE_NAME, LINE_VAR, useToast } from '../components/ui';
 
-const KINDS: [FieldKind, string][] = [
+export const KINDS: [FieldKind, string][] = [
   ['string', 'Texto corto'], ['text', 'Texto largo'], ['richtext', 'Texto con formato'],
   ['number', 'Número'], ['boolean', 'Sí / No'], ['image', 'Imagen'], ['reference', 'Enlace a otro contenido'],
 ];
@@ -43,7 +43,10 @@ function TypeList({ types }: { types?: ContentType[] }) {
           </Link>
         ))}
       </div>
-      <Link className="btn btn-primary" to="/modelos/nuevo"><Plus className="lucide" aria-hidden="true" />Nuevo tipo</Link>
+      <div style={{ display: 'flex', gap: 'var(--cms-space-3)', flexWrap: 'wrap' }}>
+        <Link className="btn btn-primary" to="/modelos/nuevo"><Plus className="lucide" aria-hidden="true" />Nuevo tipo</Link>
+        <Link className="btn btn-secondary" to="/importar"><FileUp className="lucide" aria-hidden="true" />Importar desde Strapi, JSON o CSV</Link>
+      </div>
     </>
   );
 }

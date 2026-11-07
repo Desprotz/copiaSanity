@@ -10,6 +10,7 @@ import { Shell } from './routes/Shell';
 import { ContentPage } from './routes/ContentPage';
 import { ModelsPage } from './routes/ModelsPage';
 import { SitePage } from './routes/SitePage';
+import { ImportPage } from './routes/ImportPage';
 
 // Tema: el sistema decide salvo que la persona haya elegido otro.
 try {
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
       { path: 'c/:typeId/:docId', element: <ContentPage /> },
       { path: 'modelos', element: <ModelsPage /> },
       { path: 'modelos/:typeId', element: <ModelsPage /> },
+      { path: 'importar', element: <ImportPage /> },
     ],
   },
   { path: '/sitio', element: <SitePage /> },

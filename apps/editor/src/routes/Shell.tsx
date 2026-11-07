@@ -191,6 +191,9 @@ export function Shell() {
         <NavLink className="route" to="/modelos" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
           <span className="ln" aria-hidden="true" /><span className="lbl">Tipos de contenido</span>
         </NavLink>
+        <NavLink className="route" to="/importar" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
+          <span className="ln" aria-hidden="true" /><span className="lbl">Importar datos</span>
+        </NavLink>
         <a className="route" href={site?.publicUrl ?? '/sitio'} target="_blank" rel="noopener" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
           <span className="ln" aria-hidden="true" /><span className="lbl">Ver el sitio</span>
         </a>

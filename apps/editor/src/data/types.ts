@@ -72,6 +72,17 @@ export interface SiteSnapshot {
 
 export type FieldErrors = Record<string, string>;
 
+/**
+ * Lote de importación (desde Strapi, JSON o CSV). Los tipos se crean o amplían y los documentos se insertan
+ * nuevos; los ids de documento vienen del navegador para poder enlazar relaciones dentro del lote.
+ */
+export interface ImportBatch {
+  types: ContentType[];
+  documents: { id: string; typeId: string; data: DocData; publish: boolean }[];
+}
+
+export interface ImportResult { types: number; created: number; published: number }
+
 export class ConflictError extends Error {
   constructor(public readonly current: CmsDocument) {
     super('El documento cambió en otra pestaña.');
