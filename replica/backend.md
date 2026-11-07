@@ -25,6 +25,12 @@ Se aplicó una versión **recortada** del diseño de 31 tablas, pensada para un 
 
 `postgres@4` (recién publicado) cerraba la conexión al hacer la negociación TLS dentro de `workerd` en Windows; `postgres@3.4.9` (la versión que documenta Cloudflare) funciona. Se fijó v3. Diagnóstico: sockets de `workerd` y red hacia Neon (IPv4 e IPv6) comprobados por separado y correctos.
 
+## Varios sitios (migración 002, 2026-11-07)
+
+Cada web (propia o de un cliente) es un **sitio** con sus tipos, documentos, fotos, estado y compilaciones. Todas las tablas llevan `site_id` en la clave primaria y en las claves foráneas compuestas, así que la base impide enlazar un documento con un tipo de otro sitio. El API agrupa las rutas en `/api/v1/s/:sitio/...`, comprueba que el sitio existe y pasa su id a cada consulta; `GET/POST /api/v1/sites` lista y crea sitios. Probado: desde el portafolio, leer, publicar o crear documentos del portal devuelve 404. Dos sitios ficticios (`portal-prueba`, `portafolio-prueba`); «Restaurar datos de prueba» solo actúa sobre ellos.
+
+Pendiente para clientes: quién puede entrar a qué sitio (membresías y roles, M6) y un proyecto de Pages por sitio al desplegar. Las compilaciones de Pages (≈500/mes) y los 50 usuarios de Access se comparten entre todos los sitios de la cuenta.
+
 ## Lista de seguridad
 
 - [x] Secretos solo en variables de entorno: `DATABASE_URL` en `apps/api/.dev.vars`, excluido de git; `.dev.vars.example` sin valores.

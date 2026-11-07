@@ -1,6 +1,10 @@
 import { Check, ChevronDown, Moon, Plus, Sun, User } from 'lucide-react';
 import { Button, Dialog, Heading, Menu, MenuItem, MenuTrigger, Modal, ModalOverlay, Popover, Separator } from 'react-aria-components';
 import { useSites } from '../data/sites';
+import { SEED_SITES } from '../data/seed';
+
+/** Solo los sitios de prueba (y el modo sin conexión) se pueden restaurar. */
+const DEMO_IDS = ['local', ...SEED_SITES.map((s) => s.id)];
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router';
 import { formatTime } from '../data/domain';
@@ -95,6 +99,7 @@ function SiteSwitcher() {
 }
 
 export function Shell() {
+  const { site } = useSites();
   const store = useStore();
   const navigate = useNavigate();
   const toast = useToast();
@@ -146,7 +151,7 @@ export function Shell() {
         <a className="route" href="/sitio" target="_blank" rel="noopener" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
           <span className="ln" aria-hidden="true" /><span className="lbl">Ver el sitio</span>
         </a>
-        <div className="foot"><button type="button" onClick={reset}>Restaurar datos de prueba</button></div>
+        {(!site || DEMO_IDS.includes(site.id)) && <div className="foot"><button type="button" onClick={reset}>Restaurar datos de prueba</button></div>}
       </nav>
       <Outlet />
     </div>
