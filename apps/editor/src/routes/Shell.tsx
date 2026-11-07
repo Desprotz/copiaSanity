@@ -1,6 +1,7 @@
 import { Check, ChevronDown, Moon, Plus, Sun, User } from 'lucide-react';
 import { Button, Dialog, Heading, Menu, MenuItem, MenuTrigger, Modal, ModalOverlay, Popover, Separator } from 'react-aria-components';
 import { useSites } from '../data/sites';
+import { useAuth } from './Login';
 import { SEED_SITES } from '../data/seed';
 
 /** Solo los sitios de prueba (y el modo sin conexión) se pueden restaurar. */
@@ -100,6 +101,7 @@ function SiteSwitcher() {
 
 export function Shell() {
   const { site } = useSites();
+  const auth = useAuth();
   const store = useStore();
   const navigate = useNavigate();
   const toast = useToast();
@@ -133,7 +135,15 @@ export function Shell() {
         <button className="icon-btn" type="button" onClick={toggleTheme} aria-label={dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}>
           {dark ? <Sun className="lucide" /> : <Moon className="lucide" />}
         </button>
-        <button className="icon-btn account" type="button" aria-label="Tu cuenta"><User className="lucide" /></button>
+        <MenuTrigger>
+          <Button className="icon-btn account" aria-label="Tu cuenta"><User className="lucide" /></Button>
+          <Popover placement="bottom end" offset={6}>
+            <Menu className="menu-pop" aria-label="Cuenta" onAction={(k) => { if (k === 'logout') void auth?.logout(); }}>
+              <MenuItem id="who" className="menu-item" isDisabled textValue="Usuario">{auth ? `${auth.me.displayName} (${auth.me.username})` : 'Modo sin conexión'}</MenuItem>
+              {auth && <MenuItem id="logout" className="menu-item">Cerrar sesión</MenuItem>}
+            </Menu>
+          </Popover>
+        </MenuTrigger>
       </header>
       <nav className="rail" aria-label="Contenido">
         <h2>Contenido</h2>

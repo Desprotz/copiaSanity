@@ -2,7 +2,8 @@ import type { ContentStore } from './store';
 import { ConflictError, type Asset, type CmsDocument, type ContentType, type DocData, type Site, type SiteSnapshot, type SiteStatus } from './types';
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch('/api/v1' + path, { ...init, headers: { 'content-type': 'application/json' }, credentials: 'same-origin' }).catch(() => { throw new Error('Sin conexión con el servidor.'); });
+  const res = await fetch('/api/v1' + path, { ...init, headers: { 'content-type': 'application/json', 'x-cms': '1' }, credentials: 'same-origin' }).catch(() => { throw new Error('Sin conexión con el servidor.'); });
+  if (res.status === 401) window.dispatchEvent(new Event('cms:session-expired'));
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(typeof body.error === 'string' ? body.error : `El servidor respondió ${res.status}.`);
   return body as T;
@@ -36,10 +37,11 @@ export class ApiStore implements ContentStore {
   private async req<T>(path: string, init: RequestInit = {}): Promise<T> {
     let res: Response;
     try {
-      res = await fetch(this.base + path, { ...init, headers: { ...(init.body && !(init.body instanceof Blob) ? { 'content-type': 'application/json' } : {}), ...init.headers }, credentials: 'same-origin' });
+      res = await fetch(this.base + path, { ...init, headers: { 'x-cms': '1', ...(init.body && !(init.body instanceof Blob) ? { 'content-type': 'application/json' } : {}), ...init.headers }, credentials: 'same-origin' });
     } catch {
       throw new Error('Sin conexión con el servidor. Revisa tu internet; tus cambios siguen en pantalla.');
     }
+    if (res.status === 401) { window.dispatchEvent(new Event('cms:session-expired')); throw new Error('Tu sesión terminó. Vuelve a iniciar sesión.'); }
     if (res.status === 204) return undefined as T;
     const body = await res.json().catch(() => ({}));
     if (res.status === 409 && body.current) throw new ConflictError(body.current as CmsDocument);

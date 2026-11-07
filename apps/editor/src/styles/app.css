@@ -331,3 +331,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .project[data-focus-visible] { outline: 2px solid var(--cms-color-focus); outline-offset: 2px; }
 .site-dot { width: 24px; height: 24px; border-radius: var(--cms-radius-sm); display: inline-grid; place-items: center; background: var(--cms-color-accent); color: var(--cms-color-on-accent); font-size: var(--cms-text-xs); font-weight: 800; flex: none; }
 .menu-sep { height: 1px; background: var(--cms-color-border); margin: 6px 4px; }
+
+/* Inicio de sesión */
+.login { min-height: 100dvh; display: grid; place-items: center; padding: 16px; background: var(--cms-color-shell); }
+.login-card { width: min(400px, 100%); background: var(--cms-color-surface-raised); border-radius: var(--cms-radius-lg); box-shadow: var(--cms-shadow-pop); padding: var(--cms-space-7) var(--cms-space-6); display: grid; gap: var(--cms-space-2); }
+.login-card h1 { font-size: var(--cms-text-xl); line-height: var(--cms-text-xl-line); font-weight: 800; margin-top: var(--cms-space-5); }
+.login-card .muted { margin-bottom: var(--cms-space-5); }
+.login-card .field { margin-bottom: var(--cms-space-4); }
+.login-logo { height: 28px; width: auto; }
+[data-theme="dark"] .login-logo { content: url(/logo-mse-blanco.svg); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .login-logo { content: url(/logo-mse-blanco.svg); } }

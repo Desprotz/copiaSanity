@@ -3,6 +3,8 @@ import postgres from 'postgres';
 
 type Sql = postgres.Sql;
 import { z } from 'zod';
+import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
+import * as auth from './auth';
 import * as repo from './repo';
 import { HttpError } from './repo';
 
@@ -10,12 +12,10 @@ export interface Env {
   DATABASE_URL?: string;
   /** Al desplegar: binding de Hyperdrive hacia Neon. */
   HYPERDRIVE?: { connectionString: string };
-  /** Solo en desarrollo local (.dev.vars). Sin esto, el API exige Cloudflare Access. */
-  DEV_AUTH?: string;
   BUILD_BATCH_SECONDS?: string;
 }
 
-type Vars = { sql: Sql; actor: string; ctx: repo.Ctx };
+type Vars = { sql: Sql; actor: string; ctx: repo.Ctx; user: auth.SessionUser };
 const app = new Hono<{ Bindings: Env; Variables: Vars }>().basePath('/api/v1');
 
 const MAX_JSON = 1024 * 1024;
@@ -30,17 +30,24 @@ function connect(env: Env): Sql {
 
 const batch = (env: Env) => Math.max(1, Math.min(3600, Number(env.BUILD_BATCH_SECONDS ?? 300) || 300));
 
-// Identidad: en producción la da Cloudflare Access (JWT verificado en replica-deploy). Hasta entonces, falla cerrado.
+// Identidad: inicio de sesión propio (src/auth.ts). Sin sesión válida, todo lo que no sea /auth responde 401.
 app.use('*', async (c, next) => {
-  if (c.env.DEV_AUTH === '1') c.set('actor', 'dev@local');
-  else return c.json({ error: 'Acceso no configurado. Este API solo responde detrás de Cloudflare Access.' }, 401);
   const len = Number(c.req.header('content-length') ?? 0);
   const isImage = c.req.path.endsWith('/assets') && c.req.method === 'POST';
   if (len > (isImage ? MAX_IMAGE : MAX_JSON)) return c.json({ error: 'El contenido es demasiado grande.' }, 413);
+  // Defensa contra CSRF además de SameSite=Strict: las escrituras deben venir del propio editor.
+  if (c.req.method !== 'GET' && c.req.header('x-cms') !== '1') return c.json({ error: 'Solicitud no permitida.' }, 403);
   const sql = connect(c.env);
   c.set('sql', sql);
-  try { await next(); }
-  finally { c.executionCtx.waitUntil(sql.end({ timeout: 5 })); }
+  try {
+    if (!c.req.path.startsWith('/api/v1/auth/')) {
+      const user = await auth.sessionUser(sql, getCookie(c, auth.COOKIE));
+      if (!user) return c.json({ error: 'Tu sesión terminó. Vuelve a iniciar sesión.' }, 401);
+      c.set('user', user);
+      c.set('actor', user.username);
+    }
+    await next();
+  } finally { c.executionCtx.waitUntil(sql.end({ timeout: 5 })); }
 });
 
 app.onError((err, c) => {
@@ -84,8 +91,32 @@ const param = (c: Context, name: string) => id.parse(c.req.param(name));
 
 const siteId = z.string().regex(/^[a-z0-9-]{2,40}$/);
 
-app.get('/sites', async (c) => { await repo.ensureSeeded(c.var.sql, c.var.actor); return c.json(await repo.listSites(c.var.sql)); });
+app.post('/auth/login', async (c) => {
+  const { username, password } = await body(c, z.object({ username: z.string().trim().toLowerCase().min(1).max(40), password: z.string().min(1).max(200) }));
+  const ip = c.req.header('cf-connecting-ip') ?? c.req.header('x-forwarded-for') ?? 'local';
+  const token = await auth.login(c.var.sql, username, password, ip);
+  setCookie(c, auth.COOKIE, token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/api', maxAge: auth.SESSION_DAYS * 86400 });
+  return c.json(await auth.sessionUser(c.var.sql, token));
+});
+app.post('/auth/logout', async (c) => {
+  await auth.logout(c.var.sql, getCookie(c, auth.COOKIE));
+  deleteCookie(c, auth.COOKIE, { path: '/api', secure: true });
+  return c.body(null, 204);
+});
+app.get('/auth/me', async (c) => {
+  const user = await auth.sessionUser(c.var.sql, getCookie(c, auth.COOKIE));
+  return user ? c.json(user) : c.json({ error: 'Sin sesión.' }, 401);
+});
+
+app.get('/sites', async (c) => {
+  await repo.ensureSeeded(c.var.sql, c.var.actor);
+  const all = await repo.listSites(c.var.sql);
+  const mine = [];
+  for (const s of all) if (await auth.canUseSite(c.var.sql, c.var.user, s.id)) mine.push(s);
+  return c.json(mine);
+});
 app.post('/sites', async (c) => {
+  if (!c.var.user.isOwner) throw new HttpError(403, 'Solo el dueño de la cuenta puede crear sitios.');
   const { id, name } = await body(c, z.object({ id: siteId, name: z.string().trim().min(1).max(80) }));
   return c.json(await repo.createSite(c.var.sql, id, name, c.var.actor), 201);
 });
@@ -93,7 +124,8 @@ app.post('/sites', async (c) => {
 // Todo lo demás pertenece a un sitio: se comprueba que existe y cada consulta lleva su id.
 app.use('/s/:site/*', async (c, next) => {
   const site = siteId.parse(c.req.param('site'));
-  if (!(await repo.siteExists(c.var.sql, site))) throw new HttpError(404, 'Ese sitio no existe.');
+  // Un sitio ajeno responde igual que uno inexistente: no se revela qué sitios existen.
+  if (!(await repo.siteExists(c.var.sql, site)) || !(await auth.canUseSite(c.var.sql, c.var.user, site))) throw new HttpError(404, 'Ese sitio no existe.');
   c.set('ctx', { site, actor: c.var.actor, batchSeconds: batch(c.env) });
   await next();
 });
