@@ -1,0 +1,968 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-07T12:00:00Z",
+  "title": "Design System: Editor MSE",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Porcelana fría",
+        "canonical": "#eef2f7",
+        "oklch": "oklch(96.0% 0.008 253.9)",
+        "dark": "#0b1530",
+        "cssVar": "--cms-color-bg",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#222426",
+          "#3e4043",
+          "#5b5e62",
+          "#7d8085",
+          "#a2a5a8",
+          "#c8cbcd",
+          "#edeff1"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Porcelana hundida",
+        "canonical": "#e4e9f1",
+        "oklch": "oklch(93.3% 0.012 259.8)",
+        "dark": "#101d3d",
+        "cssVar": "--cms-color-surface",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#222427",
+          "#3d4045",
+          "#5a5e64",
+          "#7c8087",
+          "#a1a5aa",
+          "#c8cbcf",
+          "#eceff2"
+        ]
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Blanco de trabajo",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "dark": "#15244a",
+        "cssVar": "--cms-color-surface-raised",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#808080",
+          "#a4a4a4",
+          "#cacaca",
+          "#eeeeee"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Filete",
+        "canonical": "#d3dae5",
+        "oklch": "oklch(88.6% 0.017 259.4)",
+        "dark": "#26365f",
+        "cssVar": "--cms-color-border",
+        "tonalRamp": [
+          "#090b0e",
+          "#212429",
+          "#3c4046",
+          "#595e66",
+          "#7b818a",
+          "#a0a5ad",
+          "#c7cbd1",
+          "#eceff3"
+        ]
+      },
+      "border-input": {
+        "role": "neutral",
+        "displayName": "Borde de campo",
+        "canonical": "#6f7b90",
+        "oklch": "oklch(58.1% 0.035 261.7)",
+        "dark": "#7d8db3",
+        "cssVar": "--cms-color-border-input",
+        "tonalRamp": [
+          "#080b11",
+          "#1f242e",
+          "#38404e",
+          "#545e70",
+          "#758194",
+          "#9ba5b6",
+          "#c3cbd8",
+          "#e9eff9"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Tinta azul marino",
+        "canonical": "#10233d",
+        "oklch": "oklch(25.5% 0.055 256.7)",
+        "dark": "#eef2fa",
+        "cssVar": "--cms-color-text",
+        "tonalRamp": [
+          "#050b15",
+          "#1a2533",
+          "#324155",
+          "#4c5f7a",
+          "#6d829f",
+          "#94a6bf",
+          "#becce0",
+          "#e5effe"
+        ]
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Tinta atenuada",
+        "canonical": "#4a5670",
+        "oklch": "oklch(45.3% 0.045 265.4)",
+        "dark": "#a9b6d3",
+        "cssVar": "--cms-color-text-muted",
+        "tonalRamp": [
+          "#070b13",
+          "#1e2431",
+          "#374052",
+          "#525e75",
+          "#74809a",
+          "#9aa5bb",
+          "#c2cbdc",
+          "#e8effc"
+        ]
+      },
+      "shell": {
+        "role": "primary",
+        "displayName": "Esmalte medianoche",
+        "canonical": "#10233d",
+        "oklch": "oklch(25.5% 0.055 256.7)",
+        "dark": "#071025",
+        "cssVar": "--cms-color-shell",
+        "tonalRamp": [
+          "#050b15",
+          "#1a2533",
+          "#324155",
+          "#4c5f7a",
+          "#6d829f",
+          "#94a6bf",
+          "#becce0",
+          "#e5effe"
+        ]
+      },
+      "shell-raised": {
+        "role": "primary",
+        "displayName": "Medianoche elevado",
+        "canonical": "#1a2b55",
+        "oklch": "oklch(29.9% 0.079 265.3)",
+        "dark": "#13213f",
+        "cssVar": "--cms-color-shell-raised",
+        "tonalRamp": [
+          "#050a19",
+          "#19233a",
+          "#313f5f",
+          "#4a5d86",
+          "#6b80ad",
+          "#93a5cb",
+          "#bccbe9",
+          "#e4efff"
+        ]
+      },
+      "shell-text": {
+        "role": "primary",
+        "displayName": "Texto de concha",
+        "canonical": "#f4f6fb",
+        "oklch": "oklch(97.3% 0.007 268.5)",
+        "dark": "#f4f6fb",
+        "cssVar": "--cms-color-shell-text",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#232426",
+          "#3e4043",
+          "#5c5d61",
+          "#7e8084",
+          "#a3a4a8",
+          "#c9cacd",
+          "#edeef0"
+        ]
+      },
+      "shell-muted": {
+        "role": "primary",
+        "displayName": "Texto de concha atenuado",
+        "canonical": "#a9b6d3",
+        "oklch": "oklch(77.6% 0.044 266.2)",
+        "dark": "#a9b6d3",
+        "cssVar": "--cms-color-shell-muted",
+        "tonalRamp": [
+          "#080b13",
+          "#1e2431",
+          "#384051",
+          "#535d74",
+          "#758099",
+          "#9ba5ba",
+          "#c3cbdc",
+          "#e9effb"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Placa de acción",
+        "canonical": "#13254d",
+        "oklch": "oklch(27.4% 0.078 263.8)",
+        "dark": "#e8edf6",
+        "cssVar": "--cms-color-accent",
+        "tonalRamp": [
+          "#050b19",
+          "#19243a",
+          "#303f5e",
+          "#495d85",
+          "#6a80ac",
+          "#92a5ca",
+          "#bccbe9",
+          "#e3efff"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Placa de acción (hover)",
+        "canonical": "#203a72",
+        "oklch": "oklch(36.1% 0.102 263.4)",
+        "dark": "#ffffff",
+        "cssVar": "--cms-color-accent-hover",
+        "tonalRamp": [
+          "#030a1d",
+          "#152340",
+          "#2b3f67",
+          "#425c91",
+          "#637fb9",
+          "#8ca5d5",
+          "#b7cbf2",
+          "#e0efff"
+        ]
+      },
+      "accent-subtle": {
+        "role": "primary",
+        "displayName": "Velo de acción",
+        "canonical": "#e3ebfb",
+        "oklch": "oklch(93.9% 0.023 264.5)",
+        "dark": "#1c2f5c",
+        "cssVar": "--cms-color-accent-subtle",
+        "tonalRamp": [
+          "#090b0f",
+          "#21242b",
+          "#3b4049",
+          "#585e6a",
+          "#7a808e",
+          "#9fa5b0",
+          "#c6cbd4",
+          "#ebeff5"
+        ]
+      },
+      "on-accent": {
+        "role": "primary",
+        "displayName": "Texto sobre placa",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "dark": "#0f1d3a",
+        "cssVar": "--cms-color-on-accent",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#808080",
+          "#a4a4a4",
+          "#cacaca",
+          "#eeeeee"
+        ]
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "Azul señal MSE",
+        "canonical": "#2f63f5",
+        "oklch": "oklch(55.7% 0.226 264.8)",
+        "dark": "#7aa2ff",
+        "cssVar": "--cms-color-focus",
+        "tonalRamp": [
+          "#000232",
+          "#041862",
+          "#123296",
+          "#224ecd",
+          "#4074fb",
+          "#6f9fff",
+          "#a0c9ff",
+          "#cfeeff"
+        ]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Danger",
+        "canonical": "#c0322b",
+        "oklch": "oklch(53.6% 0.180 27.8)",
+        "dark": "#ff8a80",
+        "cssVar": "--cms-color-danger",
+        "tonalRamp": [
+          "#220000",
+          "#4b0103",
+          "#761411",
+          "#a62923",
+          "#d14f44",
+          "#ed8174",
+          "#ffb0a5",
+          "#ffdcd3"
+        ]
+      },
+      "danger-subtle": {
+        "role": "tertiary",
+        "displayName": "Danger subtle",
+        "canonical": "#fbe7e5",
+        "oklch": "oklch(94.3% 0.022 24.4)",
+        "dark": "#3b1a22",
+        "cssVar": "--cms-color-danger-subtle",
+        "tonalRamp": [
+          "#0f0a09",
+          "#2a2221",
+          "#483d3b",
+          "#695958",
+          "#8c7c7a",
+          "#afa19f",
+          "#d3c7c6",
+          "#f5eceb"
+        ]
+      },
+      "on-danger": {
+        "role": "tertiary",
+        "displayName": "On danger",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "dark": "#2a0a0a",
+        "cssVar": "--cms-color-on-danger",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#808080",
+          "#a4a4a4",
+          "#cacaca",
+          "#eeeeee"
+        ]
+      },
+      "success": {
+        "role": "tertiary",
+        "displayName": "Success",
+        "canonical": "#17734a",
+        "oklch": "oklch(49.3% 0.106 158.4)",
+        "dark": "#5fd39a",
+        "cssVar": "--cms-color-success",
+        "tonalRamp": [
+          "#001005",
+          "#002d18",
+          "#0e4c30",
+          "#216e49",
+          "#46926a",
+          "#79b492",
+          "#aad7bc",
+          "#d7f8e4"
+        ]
+      },
+      "warning": {
+        "role": "tertiary",
+        "displayName": "Warning",
+        "canonical": "#8a5300",
+        "oklch": "oklch(49.4% 0.109 66.9)",
+        "dark": "#f2c063",
+        "cssVar": "--cms-color-warning",
+        "tonalRamp": [
+          "#170600",
+          "#381d00",
+          "#5c3602",
+          "#825112",
+          "#a97337",
+          "#c89b6c",
+          "#e7c39f",
+          "#ffe9cf"
+        ]
+      },
+      "warning-subtle": {
+        "role": "tertiary",
+        "displayName": "Warning subtle",
+        "canonical": "#fdf1d8",
+        "oklch": "oklch(96.1% 0.035 85.4)",
+        "dark": "#33280f",
+        "cssVar": "--cms-color-warning-subtle",
+        "tonalRamp": [
+          "#0e0b05",
+          "#282319",
+          "#463f30",
+          "#665d49",
+          "#897f6a",
+          "#aca492",
+          "#d0cabc",
+          "#f3eee4"
+        ]
+      },
+      "status-draft": {
+        "role": "tertiary",
+        "displayName": "Status draft",
+        "canonical": "#8a5300",
+        "oklch": "oklch(49.4% 0.109 66.9)",
+        "dark": "#f2c063",
+        "cssVar": "--cms-color-status-draft",
+        "tonalRamp": [
+          "#170600",
+          "#381d00",
+          "#5c3602",
+          "#825112",
+          "#a97337",
+          "#c89b6c",
+          "#e7c39f",
+          "#ffe9cf"
+        ]
+      },
+      "status-draft-bg": {
+        "role": "tertiary",
+        "displayName": "Status draft bg",
+        "canonical": "#fdf1d8",
+        "oklch": "oklch(96.1% 0.035 85.4)",
+        "dark": "#33280f",
+        "cssVar": "--cms-color-status-draft-bg",
+        "tonalRamp": [
+          "#0e0b05",
+          "#282319",
+          "#463f30",
+          "#665d49",
+          "#897f6a",
+          "#aca492",
+          "#d0cabc",
+          "#f3eee4"
+        ]
+      },
+      "status-published": {
+        "role": "tertiary",
+        "displayName": "Status published",
+        "canonical": "#17734a",
+        "oklch": "oklch(49.3% 0.106 158.4)",
+        "dark": "#5fd39a",
+        "cssVar": "--cms-color-status-published",
+        "tonalRamp": [
+          "#001005",
+          "#002d18",
+          "#0e4c30",
+          "#216e49",
+          "#46926a",
+          "#79b492",
+          "#aad7bc",
+          "#d7f8e4"
+        ]
+      },
+      "status-published-bg": {
+        "role": "tertiary",
+        "displayName": "Status published bg",
+        "canonical": "#e1f4ea",
+        "oklch": "oklch(95.0% 0.024 163.1)",
+        "dark": "#10301f",
+        "cssVar": "--cms-color-status-published-bg",
+        "tonalRamp": [
+          "#080d0a",
+          "#1e2622",
+          "#38433d",
+          "#53625a",
+          "#75857c",
+          "#9ba8a1",
+          "#c3cdc8",
+          "#e9f1ec"
+        ]
+      },
+      "status-changed": {
+        "role": "tertiary",
+        "displayName": "Status changed",
+        "canonical": "#1f4fbf",
+        "oklch": "oklch(46.8% 0.184 263.4)",
+        "dark": "#8fb2ff",
+        "cssVar": "--cms-color-status-changed",
+        "tonalRamp": [
+          "#00062b",
+          "#071e56",
+          "#173986",
+          "#2956b9",
+          "#497ae4",
+          "#77a2fb",
+          "#a7caff",
+          "#d4efff"
+        ]
+      },
+      "status-changed-bg": {
+        "role": "tertiary",
+        "displayName": "Status changed bg",
+        "canonical": "#e3ebfb",
+        "oklch": "oklch(93.9% 0.023 264.5)",
+        "dark": "#1c2f5c",
+        "cssVar": "--cms-color-status-changed-bg",
+        "tonalRamp": [
+          "#090b0f",
+          "#21242b",
+          "#3b4049",
+          "#585e6a",
+          "#7a808e",
+          "#9fa5b0",
+          "#c6cbd4",
+          "#ebeff5"
+        ]
+      },
+      "status-scheduled": {
+        "role": "tertiary",
+        "displayName": "Status scheduled",
+        "canonical": "#5b3aa8",
+        "oklch": "oklch(45.0% 0.167 292.1)",
+        "dark": "#c3abff",
+        "cssVar": "--cms-color-status-scheduled",
+        "tonalRamp": [
+          "#0d0325",
+          "#27164e",
+          "#432e7a",
+          "#6248aa",
+          "#846bd4",
+          "#a795ed",
+          "#cbbfff",
+          "#efe7ff"
+        ]
+      },
+      "status-scheduled-bg": {
+        "role": "tertiary",
+        "displayName": "Status scheduled bg",
+        "canonical": "#eee8fb",
+        "oklch": "oklch(94.1% 0.026 300.3)",
+        "dark": "#2a2050",
+        "cssVar": "--cms-color-status-scheduled-bg",
+        "tonalRamp": [
+          "#0c0a0f",
+          "#25222a",
+          "#413e49",
+          "#5f5b69",
+          "#827d8d",
+          "#a6a2af",
+          "#ccc8d3",
+          "#efedf5"
+        ]
+      },
+      "status-waiting": {
+        "role": "tertiary",
+        "displayName": "Status waiting",
+        "canonical": "#0e6870",
+        "oklch": "oklch(47.3% 0.077 204.5)",
+        "dark": "#6fd6dc",
+        "cssVar": "--cms-color-status-waiting",
+        "tonalRamp": [
+          "#000f11",
+          "#002a2e",
+          "#0f484e",
+          "#226970",
+          "#468d94",
+          "#79b0b6",
+          "#a9d4d8",
+          "#d7f5f9"
+        ]
+      },
+      "status-waiting-bg": {
+        "role": "tertiary",
+        "displayName": "Status waiting bg",
+        "canonical": "#dcf2f3",
+        "oklch": "oklch(94.5% 0.023 200.1)",
+        "dark": "#0f2f38",
+        "cssVar": "--cms-color-status-waiting-bg",
+        "tonalRamp": [
+          "#070c0d",
+          "#1d2627",
+          "#354343",
+          "#506162",
+          "#728485",
+          "#99a8a9",
+          "#c1cdce",
+          "#e7f1f1"
+        ]
+      },
+      "line-red": {
+        "role": "secondary",
+        "displayName": "Escarlata",
+        "canonical": "#d93a33",
+        "oklch": "oklch(58.8% 0.197 27.6)",
+        "dark": "#ff6a5f",
+        "cssVar": "--cms-color-line-red",
+        "tonalRamp": [
+          "#240000",
+          "#4e0000",
+          "#7b070a",
+          "#ab1d1c",
+          "#d8473e",
+          "#f37c70",
+          "#ffaea1",
+          "#ffdad0"
+        ]
+      },
+      "line-blue": {
+        "role": "secondary",
+        "displayName": "Cobalto",
+        "canonical": "#2f63f5",
+        "oklch": "oklch(55.7% 0.226 264.8)",
+        "dark": "#6f9dff",
+        "cssVar": "--cms-color-line-blue",
+        "tonalRamp": [
+          "#000232",
+          "#041862",
+          "#123296",
+          "#224ecd",
+          "#4074fb",
+          "#6f9fff",
+          "#a0c9ff",
+          "#cfeeff"
+        ]
+      },
+      "line-green": {
+        "role": "secondary",
+        "displayName": "Verde andén",
+        "canonical": "#1f9a62",
+        "oklch": "oklch(60.8% 0.134 157.6)",
+        "dark": "#3fc488",
+        "cssVar": "--cms-color-line-green",
+        "tonalRamp": [
+          "#001103",
+          "#002e14",
+          "#004f2a",
+          "#007142",
+          "#2c9662",
+          "#6bb88c",
+          "#a0dab7",
+          "#d0fbe0"
+        ]
+      },
+      "line-amber": {
+        "role": "secondary",
+        "displayName": "Ámbar",
+        "canonical": "#e8a21a",
+        "oklch": "oklch(76.1% 0.154 76.5)",
+        "dark": "#f5b83d",
+        "cssVar": "--cms-color-line-amber",
+        "tonalRamp": [
+          "#190500",
+          "#3b1b00",
+          "#603400",
+          "#884f00",
+          "#af7200",
+          "#ce9a48",
+          "#ecc388",
+          "#ffeabf"
+        ]
+      },
+      "line-violet": {
+        "role": "secondary",
+        "displayName": "Violeta",
+        "canonical": "#8a5cd6",
+        "oklch": "oklch(58.3% 0.181 298.0)",
+        "dark": "#b08cff",
+        "cssVar": "--cms-color-line-violet",
+        "tonalRamp": [
+          "#100126",
+          "#2c124f",
+          "#4a297b",
+          "#6b42ab",
+          "#8e65d6",
+          "#af91ee",
+          "#d2bcff",
+          "#f4e4ff"
+        ]
+      },
+      "line-pending": {
+        "role": "secondary",
+        "displayName": "Vía pendiente",
+        "canonical": "#c3cbd8",
+        "oklch": "oklch(84.0% 0.020 260.2)",
+        "dark": "#3a4a72",
+        "cssVar": "--cms-color-line-pending",
+        "tonalRamp": [
+          "#090b0f",
+          "#21242a",
+          "#3b4048",
+          "#585e68",
+          "#7a818c",
+          "#9fa5ae",
+          "#c6cbd2",
+          "#ebeff4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Título del documento en el editor (escritorio)."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Títulos de sección; título del documento en móvil."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Encabezado de la lista y títulos de fila."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Valores de campo y texto enriquecido (máx. 70ch, interlínea 1.7)."
+      },
+      "body-sm": {
+        "displayName": "Body small",
+        "purpose": "Tamaño base de la interfaz: cuerpo, botones, riel."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Etiquetas de estado, pestañas, botón pequeño, ayudas y errores."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Solo horas, fechas y contadores."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card",
+        "value": "0 1px 2px rgba(15,29,58,.06), 0 2px 8px rgba(15,29,58,.06)",
+        "purpose": "Fila seleccionada, paneles, icono de la zona de arrastre."
+      },
+      {
+        "name": "pop",
+        "value": "0 12px 32px rgba(15,29,58,.18), 0 2px 6px rgba(15,29,58,.10)",
+        "purpose": "Aviso flotante."
+      },
+      {
+        "name": "plate",
+        "value": "0 2px 6px rgba(15,29,58,.18)",
+        "purpose": "Botón principal en reposo (literal en primitives.html, no tokenizado)."
+      },
+      {
+        "name": "plate-hover",
+        "value": "0 6px 16px rgba(15,29,58,.22)",
+        "purpose": "Botón principal en hover (literal, no tokenizado)."
+      },
+      {
+        "name": "train",
+        "value": "0 4px 12px rgba(15,29,58,.28)",
+        "purpose": "Tren del recorrido de publicación (literal, no tokenizado)."
+      },
+      {
+        "name": "bottom-bar",
+        "value": "0 -6px 20px rgba(15,29,58,.10)",
+        "purpose": "Barra fija de Publicar en móvil (literal, no tokenizado)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "duration-fast",
+        "value": "140ms",
+        "purpose": "Hover, cambios de color, escala al pulsar."
+      },
+      {
+        "name": "duration-base",
+        "value": "240ms",
+        "purpose": "Línea de foco, halos, entrada del aviso, iconos."
+      },
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16,1,.3,1)",
+        "purpose": "Curva de salida suave para todas las transiciones de estado."
+      },
+      {
+        "name": "spring",
+        "value": "linear(0, 0.18 6%, 0.5 14%, 0.86 24%, 1.06 34%, 1.1 40%, 1.07 48%, 1.01 60%, 0.99 72%, 1)",
+        "purpose": "Solo el tren y el relleno del recorrido, 1000ms."
+      },
+      {
+        "name": "arrive",
+        "value": "scale 1 -> 1.22 -> 1, 520ms ease",
+        "purpose": "Pop de la estación al llegar el tren."
+      },
+      {
+        "name": "beacon",
+        "value": "scale .6 -> 1.5, opacity .8 -> 0, 2.4s ease infinite",
+        "purpose": "Único bucle decorativo: baliza con cambios esperando."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none; transition-duration: 0ms",
+        "purpose": "Con prefers-reduced-motion todo se desactiva."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "max-width: 899px"
+      },
+      {
+        "name": "tablet",
+        "value": "max-width: 1199px"
+      },
+      {
+        "name": "desktop",
+        "value": "min-width: 1200px"
+      }
+    ],
+    "layout": {
+      "topbar": "56px",
+      "nav": "232px",
+      "list": "360px",
+      "content-max": "760px",
+      "line-weight": "8px",
+      "station": "30px"
+    }
+  },
+  "components": [
+    {
+      "name": "Botón principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Placa de señal: acción principal (Publicar), con flecha que avanza en hover.",
+      "html": "<button class=\"ds-btn-primary\">Publicar<svg class=\"ds-arrow\" viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h13M13 7l5 5-5 5\"/></svg></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 24px; border-radius: 999px; font-family: var(--cms-font-sans, Overpass, system-ui, sans-serif); font-size: 14px; font-weight: 700; cursor: pointer; transition: background-color 140ms cubic-bezier(.16,1,.3,1), border-color 140ms cubic-bezier(.16,1,.3,1), box-shadow 240ms cubic-bezier(.16,1,.3,1), transform 140ms cubic-bezier(.16,1,.3,1); border: 1px solid transparent; background: var(--cms-color-accent, #13254d); color: var(--cms-color-on-accent, #fff); box-shadow: 0 2px 6px rgba(15,29,58,.18); } .ds-btn-primary .ds-arrow { transition: transform 240ms cubic-bezier(.16,1,.3,1); } .ds-btn-primary:hover { background: var(--cms-color-accent-hover, #203a72); box-shadow: 0 6px 16px rgba(15,29,58,.22); } .ds-btn-primary:hover .ds-arrow { transform: translateX(3px); } .ds-btn-primary:active { transform: scale(.96); } .ds-btn-primary:focus-visible { outline: 2px solid var(--cms-color-focus, #2f63f5); outline-offset: 2px; }"
+    },
+    {
+      "name": "Botón secundario",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción alternativa (Guardar borrador): píldora blanca con filete.",
+      "html": "<button class=\"ds-btn-secondary\">Guardar borrador</button>",
+      "css": ".ds-btn-secondary { height: 40px; padding: 0 24px; border-radius: 999px; font-family: var(--cms-font-sans, Overpass, system-ui, sans-serif); font-size: 14px; font-weight: 700; cursor: pointer; transition: background-color 140ms cubic-bezier(.16,1,.3,1), border-color 140ms cubic-bezier(.16,1,.3,1), box-shadow 240ms cubic-bezier(.16,1,.3,1), transform 140ms cubic-bezier(.16,1,.3,1); border: 1px solid var(--cms-color-border, #d3dae5); background: var(--cms-color-surface-raised, #fff); color: var(--cms-color-text, #10233d); } .ds-btn-secondary:hover { border-color: var(--cms-color-border-input, #6f7b90); } .ds-btn-secondary:active { transform: scale(.96); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--cms-color-focus, #2f63f5); outline-offset: 2px; }"
+    },
+    {
+      "name": "Botón fantasma",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Acción terciaria (Descartar cambios).",
+      "html": "<button class=\"ds-btn-ghost\">Descartar cambios</button>",
+      "css": ".ds-btn-ghost { height: 40px; padding: 0 24px; border-radius: 999px; font-family: var(--cms-font-sans, Overpass, system-ui, sans-serif); font-size: 14px; font-weight: 700; cursor: pointer; transition: background-color 140ms cubic-bezier(.16,1,.3,1), border-color 140ms cubic-bezier(.16,1,.3,1), box-shadow 240ms cubic-bezier(.16,1,.3,1), transform 140ms cubic-bezier(.16,1,.3,1); border: 1px solid transparent; background: transparent; color: var(--cms-color-text, #10233d); } .ds-btn-ghost:hover { background: var(--cms-color-surface, #e4e9f1); } .ds-btn-ghost:active { transform: scale(.96); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--cms-color-focus, #2f63f5); outline-offset: 2px; }"
+    },
+    {
+      "name": "Botón de peligro",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Acción destructiva (Eliminar).",
+      "html": "<button class=\"ds-btn-danger\">Eliminar</button>",
+      "css": ".ds-btn-danger { height: 40px; padding: 0 24px; border-radius: 999px; font-family: var(--cms-font-sans, Overpass, system-ui, sans-serif); font-size: 14px; font-weight: 700; cursor: pointer; transition: background-color 140ms cubic-bezier(.16,1,.3,1), border-color 140ms cubic-bezier(.16,1,.3,1), box-shadow 240ms cubic-bezier(.16,1,.3,1), transform 140ms cubic-bezier(.16,1,.3,1); border: 1px solid transparent; background: var(--cms-color-danger, #c0322b); color: var(--cms-color-on-danger, #fff); } .ds-btn-danger:active { transform: scale(.96); } .ds-btn-danger:focus-visible { outline: 2px solid var(--cms-color-focus, #2f63f5); outline-offset: 2px; }"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "Campo con etiqueta, ayuda y línea de foco que se dibuja como un trazo de metro.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Precio</span><span class=\"ds-control\"><input class=\"ds-input\" value=\"420.000.000\"><span class=\"ds-unit\">COP</span></span><span class=\"ds-help\">Sin decimales. Se muestra con puntos de miles.</span></label>",
+      "css": ".ds-field { display: grid; gap: 4px; font-family: var(--cms-font-sans, Overpass, system-ui, sans-serif); color: var(--cms-color-text, #10233d); max-width: 320px; } .ds-field-label { font-size: 14px; font-weight: 700; } .ds-control { position: relative; display: block; } .ds-input { width: 100%; box-sizing: border-box; font: inherit; font-size: 16px; line-height: 24px; color: inherit; background: var(--cms-color-surface-raised, #fff); border: 1px solid var(--cms-color-border-input, #6f7b90); border-radius: 10px; padding: 10px 14px; transition: border-color 140ms cubic-bezier(.16,1,.3,1); } .ds-control::after { content: \"\"; position: absolute; left: 10px; right: 10px; bottom: 0; height: 3px; border-radius: 2px; background: var(--cms-color-focus, #2f63f5); transform: scaleX(0); transform-origin: left; transition: transform 240ms cubic-bezier(.16,1,.3,1); pointer-events: none; } .ds-control:focus-within::after { transform: scaleX(1); } .ds-input:focus, .ds-input:focus-visible { outline: none; border-color: var(--cms-color-focus, #2f63f5); } .ds-unit { position: absolute; right: 14px; top: 11px; font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--cms-color-text-muted, #4a5670); } .ds-help { font-size: 12px; line-height: 16px; font-weight: 500; color: var(--cms-color-text-muted, #4a5670); }"
+    },
+    {
+      "name": "Pestañas de filtro",
+      "kind": "chip",
+      "refersTo": "tab",
+      "description": "Filtros de la lista como píldoras; la seleccionada en placa de acción.",
+      "html": "<div class=\"ds-tabs\"><button class=\"ds-tab\" aria-selected=\"true\">Todas</button><button class=\"ds-tab\" aria-selected=\"false\">Por publicar</button><button class=\"ds-tab\" aria-selected=\"false\">Programadas</button></div>",
+      "css": ".ds-tabs { display: flex; gap: 4px; } .ds-tab { border: 1px solid var(--cms-color-border, #d3dae5); background: var(--cms-color-surface-raised, #fff); color: var(--cms-color-text, #10233d); border-radius: 999px; padding: 5px 12px; font-family: var(--cms-font-sans, Overpass, system-ui, sans-serif); font-size: 12px; font-weight: 600; cursor: pointer; transition: background-color 140ms cubic-bezier(.16,1,.3,1), color 140ms cubic-bezier(.16,1,.3,1); } .ds-tab[aria-selected=\"true\"] { background: var(--cms-color-accent, #13254d); color: var(--cms-color-on-accent, #fff); border-color: var(--cms-color-accent, #13254d); } .ds-tab:focus-visible { outline: 2px solid var(--cms-color-focus, #2f63f5); outline-offset: 2px; }"
+    },
+    {
+      "name": "Etiquetas de estado",
+      "kind": "chip",
+      "refersTo": "state-chip",
+      "description": "Estado del documento por forma + palabra + color.",
+      "html": "<div class=\"ds-states\"><span class=\"ds-state ds-s-draft\">Borrador</span><span class=\"ds-state ds-s-changed\">Cambios sin publicar</span><span class=\"ds-state ds-s-scheduled\">Programada</span><span class=\"ds-state ds-s-waiting\">Esperando el sitio</span><span class=\"ds-state ds-s-published\">En el sitio</span></div>",
+      "css": ".ds-states { display: flex; flex-wrap: wrap; gap: 8px; } .ds-state { display: inline-flex; align-items: center; gap: 6px; font-family: var(--cms-font-sans, Overpass, system-ui, sans-serif); font-size: 12px; line-height: 16px; font-weight: 700; padding: 3px 10px 3px 8px; border-radius: 999px; white-space: nowrap; } .ds-state::before { content: \"\"; width: 9px; height: 9px; border-radius: 50%; box-sizing: border-box; } .ds-s-draft { background: var(--cms-color-status-draft-bg, #fdf1d8); color: var(--cms-color-status-draft, #8a5300); } .ds-s-draft::before { border: 2px solid currentColor; } .ds-s-changed { background: var(--cms-color-status-changed-bg, #e3ebfb); color: var(--cms-color-status-changed, #1f4fbf); } .ds-s-changed::before { border: 2px solid currentColor; background: radial-gradient(currentColor 0 2px, transparent 2.5px); } .ds-s-scheduled { background: var(--cms-color-status-scheduled-bg, #eee8fb); color: var(--cms-color-status-scheduled, #5b3aa8); } .ds-s-scheduled::before { border: 2px dashed currentColor; } .ds-s-waiting { background: var(--cms-color-status-waiting-bg, #dcf2f3); color: var(--cms-color-status-waiting, #0e6870); } .ds-s-waiting::before { border: 2px solid currentColor; background: linear-gradient(90deg, currentColor 50%, transparent 50%); } .ds-s-published { background: var(--cms-color-status-published-bg, #e1f4ea); color: var(--cms-color-status-published, #17734a); } .ds-s-published::before { background: currentColor; }"
+    },
+    {
+      "name": "Riel de navegación",
+      "kind": "nav",
+      "refersTo": "nav-route",
+      "description": "Cada tipo de contenido es un tramo de línea atravesado por una estación; activo con halo ámbar.",
+      "html": "<nav class=\"ds-rail\"><a class=\"ds-route\" href=\"#\" aria-current=\"page\" style=\"--c:#d93a33\"><span class=\"ds-ln\"></span><span>Propiedades</span><span class=\"ds-n\">12</span></a><a class=\"ds-route\" href=\"#\" style=\"--c:#2f63f5\"><span class=\"ds-ln\"></span><span>Artículos</span><span class=\"ds-n\">6</span></a><a class=\"ds-route\" href=\"#\" style=\"--c:#1f9a62\"><span class=\"ds-ln\"></span><span>Agentes</span><span class=\"ds-n\">3</span></a></nav>",
+      "css": ".ds-rail { width: 232px; background: var(--cms-color-shell, #10233d); padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; font-family: var(--cms-font-sans, Overpass, system-ui, sans-serif); font-size: 14px; } .ds-route { display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px; color: var(--cms-color-shell-text, #f4f6fb); text-decoration: none; font-weight: 600; transition: background-color 140ms cubic-bezier(.16,1,.3,1); } .ds-route:hover, .ds-route[aria-current] { background: var(--cms-color-shell-raised, #1a2b55); } .ds-route:focus-visible { outline: 2px solid var(--cms-color-focus, #2f63f5); outline-offset: 2px; } .ds-ln { position: relative; width: 32px; height: 6px; border-radius: 3px; background: var(--c); } .ds-ln::after { content: \"\"; position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #fff; border: 3px solid var(--c); box-sizing: border-box; transition: transform 240ms cubic-bezier(.16,1,.3,1); } .ds-route:hover .ds-ln::after { transform: scale(1.15); } .ds-route[aria-current] .ds-ln::after { box-shadow: 0 0 0 3px color-mix(in srgb, var(--cms-color-line-amber, #e8a21a) 55%, transparent); } .ds-n { color: var(--cms-color-shell-muted, #a9b6d3); font-family: var(--cms-font-mono, 'Overpass Mono', ui-monospace, monospace); font-size: 12px; font-weight: 500; }"
+    },
+    {
+      "name": "Recorrido de publicación",
+      "kind": "custom",
+      "refersTo": "publish-journey",
+      "description": "Firma del sistema: cuatro estaciones sobre la línea del tipo; la actual con halo ámbar y el tren estacionado justo antes de ella.",
+      "html": "<div class=\"ds-track\"><span class=\"ds-fill\"></span><span class=\"ds-train\"></span><div class=\"ds-stop ds-done\"><span class=\"ds-dot\"></span><strong>Borrador</strong><small>creado 2 nov</small></div><div class=\"ds-stop ds-done\"><span class=\"ds-dot\"></span><strong>Revisado</strong><small>sin errores</small></div><div class=\"ds-stop ds-done\"><span class=\"ds-dot\"></span><strong>Publicado</strong><small>ahora</small></div><div class=\"ds-stop ds-now\"><span class=\"ds-dot\"></span><strong>En el sitio</strong><small>próximo 14:05</small></div></div>",
+      "css": ".ds-track { --c: var(--cms-color-line-red, #d93a33); --p: 2; position: relative; display: grid; grid-template-columns: repeat(4, 1fr); width: 560px; max-width: 100%; font-family: var(--cms-font-sans, Overpass, system-ui, sans-serif); font-size: 14px; color: var(--cms-color-text, #10233d); } .ds-track::before, .ds-fill { content: \"\"; position: absolute; top: 11px; left: 12.5%; height: 8px; border-radius: 4px; } .ds-track::before { right: 12.5%; background: var(--cms-color-line-pending, #c3cbd8); } .ds-fill { width: calc(var(--p) * 25%); background: var(--c); transition: width 1000ms linear(0, 0.18 6%, 0.5 14%, 0.86 24%, 1.06 34%, 1.1 40%, 1.07 48%, 1.01 60%, 0.99 72%, 1); } .ds-train { position: absolute; top: 6px; left: calc(12.5% + var(--p) * 25%); width: 38px; height: 18px; margin-left: -19px; transform: translateX(-38px); border-radius: 9px; background: var(--cms-color-accent, #13254d); box-shadow: 0 4px 12px rgba(15,29,58,.28); transition: left 1000ms linear(0, 0.18 6%, 0.5 14%, 0.86 24%, 1.06 34%, 1.1 40%, 1.07 48%, 1.01 60%, 0.99 72%, 1); } .ds-train::before, .ds-train::after { content: \"\"; position: absolute; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--cms-color-line-amber, #e8a21a); } .ds-train::before { left: 7px; } .ds-train::after { right: 7px; } .ds-stop { position: relative; z-index: 1; display: grid; justify-items: center; gap: 6px; text-align: center; } .ds-dot { width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%; border: 6px solid var(--cms-color-line-pending, #c3cbd8); background: #fff; transition: border-color 240ms cubic-bezier(.16,1,.3,1), box-shadow 240ms cubic-bezier(.16,1,.3,1); } .ds-done .ds-dot { border-color: var(--c); } .ds-now .ds-dot { border-color: var(--cms-color-text, #10233d); box-shadow: 0 0 0 5px color-mix(in srgb, var(--cms-color-line-amber, #e8a21a) 55%, transparent); } .ds-stop strong { font-weight: 700; } .ds-stop small { font-size: 12px; line-height: 16px; color: var(--cms-color-text-muted, #4a5670); } .ds-now small { color: var(--cms-color-text, #10233d); font-weight: 700; }"
+    },
+    {
+      "name": "Baliza del sitio",
+      "kind": "custom",
+      "refersTo": "site-beacon",
+      "description": "Píldora de la barra superior: aro ámbar que late con cambios esperando; verde y quieto al día.",
+      "html": "<div class=\"ds-bar\"><div class=\"ds-next\" role=\"status\"><span class=\"ds-beacon\"></span>2 cambios esperando<span class=\"ds-t\">próximo al sitio 14:05</span></div></div>",
+      "css": ".ds-bar { background: var(--cms-color-shell, #10233d); padding: 12px 16px; display: flex; } .ds-next { display: flex; align-items: center; gap: 12px; padding: 6px 14px 6px 10px; border-radius: 999px; background: var(--cms-color-shell-raised, #1a2b55); color: var(--cms-color-shell-text, #f4f6fb); font-family: var(--cms-font-sans, Overpass, system-ui, sans-serif); font-size: 14px; font-weight: 600; } .ds-t { color: var(--cms-color-shell-muted, #a9b6d3); font-family: var(--cms-font-mono, 'Overpass Mono', ui-monospace, monospace); font-size: 12px; font-weight: 500; } .ds-beacon { position: relative; width: 12px; height: 12px; box-sizing: border-box; border-radius: 50%; background: var(--cms-color-shell, #10233d); border: 3px solid var(--cms-color-line-amber, #e8a21a); } .ds-beacon::after { content: \"\"; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--cms-color-line-amber, #e8a21a); opacity: 0; animation: ds-beacon 2.4s cubic-bezier(.16,1,.3,1) infinite; } @keyframes ds-beacon { 0% { transform: scale(.6); opacity: .8; } 70%, 100% { transform: scale(1.5); opacity: 0; } } @media (prefers-reduced-motion: reduce) { .ds-beacon::after { animation: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Mapa de metro",
+    "overview": "Publicar es un viaje visible. Cada documento recorre una línea de metro con cuatro estaciones (Borrador, Revisado, Publicado, En el sitio) y quien edita siempre sabe en qué estación está. El sistema rechaza el editor gris con un punto de color por estado: el estado se dibuja como un recorrido, con trazos gruesos redondeados y estaciones blancas de aro grueso, como en un plano de transporte.\n\nEl mundo tiene dos materiales. Un esmalte azul medianoche (el azul marino de MSE) envuelve la barra superior y el riel de navegación; el área de trabajo es porcelana fría (lista) y blanco (editor), nunca crema. Cada tipo de contenido es una línea con color propio que solo aparece como trazo. La tipografía viene de la señalética de autopista (Overpass) y los botones son placas de señal: píldoras sólidas.\n\nLa complejidad visual se concentra en un solo gesto, el recorrido de publicación con su tren que avanza con resorte; todo lo demás son controles estándar, calmados y densos en la medida justa para una herramienta de trabajo. Claro y oscuro existen en paridad, con contraste AA comprobado en ambos (`contrast.py`, `check_dark.py`).",
+    "keyCharacteristics": [
+      "Concha azul medianoche + área de trabajo porcelana y blanca.",
+      "Cinco líneas de color por tipo de contenido, siempre como trazo redondeado.",
+      "Estaciones blancas con aro grueso; la actual lleva aro azul marino y halo ámbar.",
+      "Estado legible por forma + palabra + color, nunca solo color.",
+      "Acciones como píldoras sólidas; una única firma animada (el tren).",
+      "Logo MSE tal como se entrega, blanco sobre la barra medianoche."
+    ],
+    "rules": [
+      {
+        "name": "La regla del trazo",
+        "body": "Los colores de línea solo aparecen como trazos redondeados (6 a 8 px de grosor), aros de estación, halos y puntos de luz. Nunca como fondo de superficie ni como color de texto.",
+        "section": "colors"
+      },
+      {
+        "name": "La regla forma + palabra",
+        "body": "Ningún estado depende solo del color: borrador = estación vacía, cambios sin publicar = estación con punto, programada = aro punteado, esperando el sitio = media estación, en el sitio = estación llena; siempre con su palabra al lado.",
+        "section": "colors"
+      },
+      {
+        "name": "La regla del tema por rol",
+        "body": "Los componentes usan roles (`--cms-color-*`, clases Tailwind mapeadas), nunca hex sueltos. El oscuro cambia valores, no nombres; se activa por `prefers-color-scheme` o por `data-theme` en la raíz.",
+        "section": "colors"
+      },
+      {
+        "name": "La regla del reloj",
+        "body": "Overpass Mono solo para horas, fechas y contadores (hora de la fila, «próximo al sitio 14:05», contadores del riel). Las etiquetas cortas, aunque sean breves, van en Overpass.",
+        "section": "typography"
+      },
+      {
+        "name": "La regla de las fuentes propias",
+        "body": "Overpass y Overpass Mono (OFL) se sirven desde el propio sitio en la app; el enlace a Google Fonts es solo de la muestra.",
+        "section": "typography"
+      },
+      {
+        "name": "La regla de la sombra marina",
+        "body": "Toda sombra es difusa y teñida de azul marino (`rgba(15,29,58,…)`), nunca negra ni desplazada en duro. Los estados de foco se hacen con anillo, no con sombra.",
+        "section": "elevation"
+      },
+      {
+        "name": "La regla de la placa",
+        "body": "Lo que se pulsa es una píldora; lo que contiene información es un rectángulo suave. No hay esquinas rectas en la interfaz.",
+        "section": "shapes"
+      },
+      {
+        "name": "La regla de la estación blanca",
+        "body": "Las estaciones son siempre blancas puras, también en oscuro, con aro del color de la línea si ya se alcanzaron, aro pendiente si no, y aro azul marino con halo ámbar si es la actual.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** dibujar cada tipo de contenido como una línea de color con trazo redondeado y estaciones blancas de aro grueso (línea de 8 px, estación de 30 px en el recorrido).",
+      "**Do** acompañar cada estado con forma y palabra, además del color.",
+      "**Do** usar píldoras completas para todo lo que se pulsa y 10 / 16 px para contenedores.",
+      "**Do** animar los detalles entre 140 y 240 ms con `cubic-bezier(.16,1,.3,1)` y reservar el resorte solo para el tren y el relleno del recorrido.",
+      "**Do** usar Overpass Mono solo para horas, fechas y contadores.",
+      "**Do** usar el logo MSE tal como se entrega: blanco sobre medianoche, a color sobre fondos claros.",
+      "**Do** mantener en móvil objetivos de 44 px y la acción Publicar en la barra fija inferior."
+    ],
+    "donts": [
+      "**Don't** usar los colores de línea como fondo de superficie o como color de texto.",
+      "**Don't** comunicar un estado solo con un punto de color.",
+      "**Don't** añadir un segundo gesto llamativo ni otro bucle decorativo: la baliza que late es el único (el spinner de carga es funcional).",
+      "**Don't** redibujar, recolorear ni imitar el logo MSE con formas propias.",
+      "**Don't** usar sombras negras o desplazadas en duro; las sombras son difusas y teñidas de azul marino.",
+      "**Don't** atenuar con transparencia un botón desactivado; usa superficie hundida y texto atenuado.",
+      "**Don't** usar hex sueltos en componentes; siempre el rol del token."
+    ]
+  }
+}

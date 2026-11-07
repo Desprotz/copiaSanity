@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>App cercana</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;font:16px/1.45 "Nunito Sans",system-ui,sans-serif;background:#f6f1ea;color:#2b2522}
+.wrap{display:grid;grid-template-columns:420px 1fr;gap:28px;padding:28px 40px 0;height:808px}
+h2{font-size:26px;font-weight:800;margin-bottom:16px}
+.card{background:#fff;border-radius:20px;padding:18px 20px;margin-bottom:12px;display:flex;gap:14px;align-items:center;box-shadow:0 1px 2px rgba(43,37,34,.06)}
+.card.sel{outline:2px solid #c8401c}
+.ph{width:56px;height:56px;border-radius:14px;background:#efe6da}
+.card b{display:block}
+.pill{display:inline-block;margin-top:4px;font-size:13px;font-weight:700;padding:2px 10px;border-radius:999px;background:#f1ebe3;color:#6d625a}
+.pill.p{background:#e3f4ea;color:#1d6b40}
+.ed{background:#fff;border-radius:24px;padding:30px 36px;position:relative}
+h1{font-size:30px;font-weight:800;margin-bottom:6px}
+.sub{color:#6d625a;margin-bottom:24px}
+label{display:block;font-weight:700;margin:18px 0 6px}
+.in{background:#f8f4ef;border:1.5px solid #8b8079;border-radius:14px;padding:12px 14px}
+.in.err{border-color:#c4302b}.e{color:#c4302b;font-size:14px;margin-top:6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.btn{position:absolute;right:36px;top:30px;background:#c8401c;color:#fff;font-weight:800;padding:14px 30px;border-radius:999px}
+.bar{position:fixed;left:0;right:0;bottom:0;height:92px;background:#fff;display:flex;justify-content:center;gap:120px;align-items:center;font-weight:700;color:#6d625a}
+.bar .on{color:#c8401c}
+</style></head><body>
+<div class="wrap"><div><h2>Propiedades</h2>
+<div class="card sel"><div class="ph"></div><div><b>Casa con patio, Barrio Ficticio</b><span class="pill">Cambios sin publicar</span></div></div>
+<div class="card"><div class="ph"></div><div><b>Apartamento cerca del parque</b><span class="pill p">Publicado</span></div></div>
+<div class="card"><div class="ph"></div><div><b>Local comercial esquinero</b><span class="pill">Borrador</span></div></div>
+<div class="card"><div class="ph"></div><div><b>Lote campestre con vista</b><span class="pill">Programado 15 nov</span></div></div>
+</div>
+<div class="ed"><span class="btn">Publicar</span><h1>Casa con patio en Barrio Ficticio</h1><p class="sub">Guardado hace un momento · el sitio se actualiza a las 14:05</p>
+<div class="two"><div><label>Precio (COP)</label><div class="in">420.000.000</div></div><div><label>Habitaciones</label><div class="in err">&nbsp;</div><div class="e">Escribe un número entre 1 y 20.</div></div></div>
+<label>Descripción</label><div class="in" style="min-height:150px">Casa de dos plantas con patio interior, cocina abierta y mucha luz por la tarde.</div></div></div>
+<div class="bar"><span class="on">Contenido</span><span>Medios</span><span>Sitio</span><span>Ajustes</span></div>
+</body></html>

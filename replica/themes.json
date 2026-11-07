@@ -1,0 +1,14 @@
+{
+  "_about": "Clasificación de extractos breves revisados manualmente. No mide sentimiento ni prevalencia. Cada patrón se eligió tras leer el contexto; los porcentajes solo describen esta selección.",
+  "request_patterns": [],
+  "themes": [
+    {"id":"learning","label":"Aprendizaje y configuración","kind":"complaint","patterns":["hard to learn","^struggle$","^custom$","Custom inputs","learning curve"]},
+    {"id":"docs","label":"Ejemplos y documentación","kind":"complaint","patterns":["out of date"]},
+    {"id":"cost","label":"Comprensión de costes","kind":"complaint","patterns":["^Pricing$","deducted"]},
+    {"id":"hosting","label":"Control del backend y alojamiento propio","kind":"request","patterns":["self-hosted","ownership and control"]},
+    {"id":"media","label":"Incidencia de subida de imágenes sin verificar","kind":"complaint","patterns":["upload issues"]},
+    {"id":"graphql","label":"Mejor experiencia relativa con GraphQL","kind":"request","patterns":["^equally$"]},
+    {"id":"navigation","label":"Navegar entre proyectos","kind":"complaint","patterns":["right Studio"]},
+    {"id":"historical","label":"Carencia histórica no especificada","kind":"request","patterns":["not available yet"]}
+  ]
+}

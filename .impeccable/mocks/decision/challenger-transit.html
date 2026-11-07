@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Mapa de metro</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;font:15px/1.45 "Hanken Grotesk",system-ui,sans-serif;background:#f4f1e8;color:#13203b}
+.top{height:60px;background:#0f1d3a;color:#f4f1e8;display:flex;align-items:center;padding:0 24px;gap:20px}
+.brand{font-weight:700;font-size:18px}
+.site{margin-left:auto;display:flex;align-items:center;gap:10px;font-weight:600}
+.site i{width:14px;height:14px;border-radius:50%;border:3px solid #f2b233;background:#0f1d3a}
+.wrap{display:grid;grid-template-columns:240px 440px 1fr;height:840px}
+nav{background:#14254a;padding:18px 0;color:#c8d0e3}
+nav a{display:flex;align-items:center;gap:12px;padding:11px 22px;font-weight:600}
+nav a i{width:22px;height:6px;border-radius:3px}
+nav a.on{background:#1d3363;color:#fff}
+.list{border-right:1px solid #ddd8c9}
+.row{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid #e6e1d3}
+.row.sel{background:#fff}
+.row .t{font-weight:600;flex:1}
+.mini{display:flex;align-items:center}
+.mini i{width:10px;height:10px;border-radius:50%;border:2px solid #2f6fe0;background:#fff}
+.mini i.f{background:#2f6fe0}
+.mini b{width:12px;height:3px;background:#2f6fe0}
+.ed{background:#fff;padding:26px 36px}
+h1{font-size:32px;line-height:1.15;margin-bottom:22px}
+.line{position:relative;display:flex;justify-content:space-between;margin:6px 0 34px;padding:0 10px}
+.line:before{content:"";position:absolute;left:20px;right:20px;top:11px;height:8px;background:#e2403a;border-radius:4px}
+.line .gray:before{content:""}
+.stn{position:relative;text-align:center;width:150px}
+.stn i{display:block;margin:0 auto 8px;width:30px;height:30px;border-radius:50%;background:#fff;border:6px solid #e2403a}
+.stn.now i{width:38px;height:38px;margin-top:-4px;border-color:#0f1d3a;box-shadow:0 0 0 4px #f2b233}
+.stn.next i{border-color:#c9c3b3}
+.stn span{font-weight:700;font-size:14px}
+.stn small{display:block;color:#5d6780;font-size:13px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+label{display:block;font-weight:600;margin:16px 0 6px}
+.in{border:1.5px solid #7b839a;border-radius:8px;padding:10px 12px}
+.in.err{border-color:#c4302b}.e{color:#c4302b;font-size:13px;margin-top:6px}
+.btn{position:absolute;right:36px;top:86px;background:#e2403a;color:#fff;font-weight:700;padding:12px 26px;border-radius:999px}
+</style></head><body>
+<div class="top"><span class="brand">CMS · Portal de prueba</span><span class="site"><i></i>Sitio: 2 cambios en camino</span></div>
+<div class="wrap">
+<nav><a class="on"><i style="background:#e2403a"></i>Propiedades</a><a><i style="background:#2f6fe0"></i>Artículos</a><a><i style="background:#2fa36b"></i>Agentes</a><a><i style="background:#f2b233"></i>Categorías</a></nav>
+<div class="list">
+<div class="row sel"><span class="t">Casa con patio, Barrio Ficticio</span><span class="mini"><i class="f"></i><b></b><i class="f"></i><b></b><i></i></span></div>
+<div class="row"><span class="t">Apartamento cerca del parque</span><span class="mini"><i class="f"></i><b></b><i class="f"></i><b></b><i class="f"></i></span></div>
+<div class="row"><span class="t">Local comercial esquinero</span><span class="mini"><i class="f"></i><b></b><i></i><b></b><i></i></span></div>
+<div class="row"><span class="t">Lote campestre con vista</span><span class="mini"><i class="f"></i><b></b><i class="f"></i><b></b><i></i></span></div>
+</div>
+<div class="ed" style="position:relative"><h1>Casa con patio en Barrio Ficticio</h1>
+<span class="btn">Publicar</span>
+<div class="line"><div class="stn"><i></i><span>Borrador</span><small>13:52</small></div><div class="stn"><i></i><span>Revisado</span><small>sin errores</small></div><div class="stn now"><i></i><span>Publicado</span><small>versión anterior</small></div><div class="stn next"><i></i><span>En el sitio</span><small>próxima 14:05</small></div></div>
+<div class="two"><div><label>Precio (COP)</label><div class="in">420.000.000</div></div><div><label>Habitaciones</label><div class="in err">&nbsp;</div><div class="e">Escribe un número entre 1 y 20.</div></div></div>
+<label>Descripción</label><div class="in" style="min-height:140px">Casa de dos plantas con patio interior, cocina abierta y mucha luz por la tarde.</div>
+</div></div>
+</body></html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Tablero de salidas</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;font:15px/1.4 Barlow,system-ui,sans-serif;background:#f4f3ee;color:#16191f}
+.top{height:56px;background:#12151b;color:#f3f1ea;display:flex;align-items:center;gap:24px;padding:0 20px}
+.brand{font:700 20px "Barlow Condensed";letter-spacing:.04em}
+.dep{display:flex;gap:2px;margin-left:24px}
+.cell{background:#1b2029;padding:6px 12px;font:600 15px "Barlow Condensed";letter-spacing:.08em;text-transform:uppercase;color:#8d95a3}
+.cell b{color:#f5b83d;font-family:"JetBrains Mono";font-weight:500;margin-right:8px;letter-spacing:0}
+.site{margin-left:auto;display:flex;align-items:center;gap:10px;font:600 14px "Barlow Condensed";letter-spacing:.08em;text-transform:uppercase}
+.site i{width:10px;height:10px;background:#f5b83d;display:inline-block}
+.wrap{display:grid;grid-template-columns:220px 520px 1fr;height:844px}
+nav{background:#1b2029;color:#c9ced8;padding:16px 10px}
+nav a{display:flex;justify-content:space-between;padding:10px 12px;font-weight:500;border-left:3px solid transparent}
+nav a.on{background:#262c37;color:#fff;border-left-color:#f5b83d}
+nav small{font-family:"JetBrains Mono";color:#8d95a3}
+.list{border-right:1px solid #dcdad2;background:#fbfaf6}
+.lh{display:grid;grid-template-columns:1fr 150px 90px;padding:14px 20px;font:600 13px "Barlow Condensed";letter-spacing:.1em;text-transform:uppercase;color:#6b6f78;border-bottom:2px solid #16191f}
+.row{display:grid;grid-template-columns:1fr 150px 90px;align-items:center;height:56px;padding:0 20px;border-bottom:1px solid #e5e3db}
+.row.sel{background:#fff;box-shadow:inset 3px 0 0 #f5b83d}
+.row .t{font-weight:600}
+.st{font:700 14px "Barlow Condensed";letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.st:before{content:"";width:10px;height:10px}
+.pub{color:#17804f}.pub:before{background:#17804f;border-radius:50%}
+.chg{color:#1f5fbf}.chg:before{background:#1f5fbf;transform:rotate(45deg)}
+.drf{color:#a35c00}.drf:before{border:2px solid #a35c00}
+.sch{color:#6b3fb8}.sch:before{background:#6b3fb8;clip-path:polygon(0 0,100% 50%,0 100%)}
+.tm{font-family:"JetBrains Mono";font-size:13px;color:#6b6f78}
+.ed{background:#fff;display:flex;flex-direction:column}
+.eh{display:flex;align-items:center;gap:16px;padding:18px 32px;border-bottom:1px solid #e5e3db}
+.eh .st{margin-left:0}
+.btn{margin-left:auto;background:#12151b;color:#f5b83d;font:700 15px "Barlow Condensed";letter-spacing:.1em;text-transform:uppercase;padding:12px 22px}
+.body{padding:28px 32px;max-width:760px}
+h1{font:600 34px/1.15 Barlow;margin-bottom:24px}
+label{display:block;font:600 13px "Barlow Condensed";letter-spacing:.1em;text-transform:uppercase;color:#6b6f78;margin:18px 0 6px}
+.in{border:1px solid #8a8e96;padding:10px 12px;font-size:16px}
+.in.err{border-color:#c4302b}
+.e{color:#c4302b;font-size:13px;margin-top:6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.rt{border:1px solid #8a8e96;padding:14px;min-height:150px;line-height:1.6}
+</style></head><body>
+<div class="top"><span class="brand">CMS · PORTAL DE PRUEBA</span>
+<div class="dep"><span class="cell"><b>14:05</b>Compilación del sitio</span><span class="cell"><b>15/11 08:00</b>Lote campestre</span><span class="cell"><b>18/11 07:30</b>Artículo: tasas</span></div>
+<span class="site"><i></i>2 cambios por salir</span></div>
+<div class="wrap">
+<nav><a class="on">Propiedades<small>12</small></a><a>Artículos<small>6</small></a><a>Agentes<small>3</small></a><a>Categorías<small>3</small></a><a>Páginas<small>4</small></a></nav>
+<div class="list"><div class="lh"><span>Documento</span><span>Estado</span><span>Hora</span></div>
+<div class="row sel"><span class="t">Casa con patio, Barrio Ficticio</span><span class="st chg">Con cambios</span><span class="tm">13:52</span></div>
+<div class="row"><span class="t">Apartamento cerca del parque</span><span class="st pub">Publicado</span><span class="tm">ayer</span></div>
+<div class="row"><span class="t">Local comercial esquinero</span><span class="st drf">Borrador</span><span class="tm">02/11</span></div>
+<div class="row"><span class="t">Lote campestre con vista</span><span class="st sch">Programado</span><span class="tm">15/11</span></div>
+<div class="row"><span class="t">Oficina en el centro</span><span class="st pub">Publicado</span><span class="tm">28/10</span></div>
+<div class="row"><span class="t">Casa esquinera de dos pisos</span><span class="st pub">Publicado</span><span class="tm">21/10</span></div>
+</div>
+<div class="ed"><div class="eh"><span class="st chg">Con cambios sin publicar</span><span class="tm">Guardado 13:52</span><span class="btn">Publicar</span></div>
+<div class="body"><h1>Casa con patio en Barrio Ficticio</h1>
+<div class="two"><div><label>Precio (COP)</label><div class="in">420.000.000</div></div><div><label>Habitaciones</label><div class="in err">&nbsp;</div><div class="e">Escribe un número entre 1 y 20.</div></div></div>
+<label>Descripción</label><div class="rt">Casa de dos plantas con patio interior, cocina abierta y mucha luz por la tarde. A diez minutos a pie del parque.</div>
+</div></div></div>
+</body></html>

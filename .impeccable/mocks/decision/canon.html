@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Estándar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;font:14px/1.45 Inter,system-ui,sans-serif;background:#fff;color:#18181b}
+.wrap{display:grid;grid-template-columns:232px 340px 1fr;height:900px}
+nav{background:#f6f6f7;border-right:1px solid #e4e4e7;padding:14px 10px}
+.ws{font-weight:600;padding:6px 10px 16px}
+nav a{display:flex;justify-content:space-between;padding:7px 10px;border-radius:6px;color:#3f3f46}
+nav a.on{background:#ebebef;color:#18181b;font-weight:500}
+.list{border-right:1px solid #e4e4e7}
+.lh{padding:14px 16px;font-weight:600;border-bottom:1px solid #e4e4e7}
+.row{padding:12px 16px;border-bottom:1px solid #f0f0f2}
+.row.sel{background:#f4f4ff}
+.row b{font-weight:500;display:block}
+.tag{font-size:12px;color:#71717a}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
+.ed{padding:20px 40px}
+.eh{display:flex;align-items:center;gap:12px;margin-bottom:28px;color:#71717a}
+.btn{margin-left:auto;background:#5b5bd6;color:#fff;font-weight:500;padding:8px 16px;border-radius:6px}
+h1{font-size:30px;font-weight:600;margin-bottom:20px}
+label{display:block;font-weight:500;margin:16px 0 6px}
+.in{border:1px solid #a1a1aa;border-radius:6px;padding:8px 10px}
+.in.err{border-color:#dc2626}.e{color:#dc2626;font-size:12px;margin-top:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:720px}
+</style></head><body>
+<div class="wrap">
+<nav><div class="ws">Portal de prueba</div><a class="on">Propiedades<span>12</span></a><a>Artículos<span>6</span></a><a>Agentes<span>3</span></a><a>Categorías<span>3</span></a></nav>
+<div class="list"><div class="lh">Propiedades</div>
+<div class="row sel"><b>Casa con patio, Barrio Ficticio</b><span class="tag"><span class="dot" style="background:#3b82f6"></span>Cambios sin publicar</span></div>
+<div class="row"><b>Apartamento cerca del parque</b><span class="tag"><span class="dot" style="background:#16a34a"></span>Publicado</span></div>
+<div class="row"><b>Local comercial esquinero</b><span class="tag"><span class="dot" style="background:#d97706"></span>Borrador</span></div>
+<div class="row"><b>Lote campestre con vista</b><span class="tag"><span class="dot" style="background:#7c3aed"></span>Programado</span></div></div>
+<div class="ed"><div class="eh">Guardado · 13:52<span class="btn">Publicar</span></div><h1>Casa con patio en Barrio Ficticio</h1>
+<div class="two"><div><label>Precio (COP)</label><div class="in">420.000.000</div></div><div><label>Habitaciones</label><div class="in err">&nbsp;</div><div class="e">Escribe un número entre 1 y 20.</div></div></div>
+<label>Descripción</label><div class="in" style="min-height:140px;max-width:720px">Casa de dos plantas con patio interior, cocina abierta y mucha luz por la tarde.</div></div>
+</div></body></html>
