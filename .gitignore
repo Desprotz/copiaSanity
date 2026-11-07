@@ -15,3 +15,6 @@ dist/
 # Secretos locales del API (Wrangler)
 .dev.vars
 .wrangler/
+
+# Guía de traspaso: se entrega aparte, no va al repositorio
+ENTREGA.md
