@@ -22,7 +22,8 @@ const MAX_JSON = 1024 * 1024;
 const MAX_IMAGE = 5 * 1024 * 1024;
 
 function connect(env: Env): Sql {
-  const url = env.HYPERDRIVE?.connectionString ?? env.DATABASE_URL;
+  // En local manda DATABASE_URL (.dev.vars); desplegado no existe y se usa el pool de Hyperdrive.
+  const url = env.DATABASE_URL ?? env.HYPERDRIVE?.connectionString;
   if (!url) throw new HttpError(503, 'El API no tiene base de datos configurada.');
   return postgres(url, { max: 5, fetch_types: false, onnotice: () => {} });
 }

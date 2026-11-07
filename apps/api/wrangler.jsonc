@@ -7,6 +7,9 @@
   // Barrido de publicaciones programadas y compilación agrupada (architecture.md: cada 5 min).
   "triggers": { "crons": ["*/5 * * * *"] },
   "vars": { "BUILD_BATCH_SECONDS": "300" },
-  "observability": { "enabled": true }
-  // Al desplegar (replica-deploy): binding de Hyperdrive hacia Neon, R2 para imágenes y Access.
+  "observability": { "enabled": true },
+  // Ids de recursos de la cuenta (no son secretos). La contraseña de Neon vive solo dentro de Hyperdrive.
+  "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "8def0a1b64ec4b9195d7309eb7078d23" }],
+  "kv_namespaces": [{ "binding": "FLAGS", "id": "bc1afd8d333341dd9a8a6a6106a9eb4b" }]
+  // Pendiente: R2 para imágenes (activar R2 en el panel) y la aplicación de Access.
 }
