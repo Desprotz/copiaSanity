@@ -47,7 +47,9 @@ function migrate(s: State): State {
   return s;
 }
 
-const delay = () => new Promise<void>((r) => setTimeout(r, 120));
+// VITE_FAKE_LATENCY simula la demora del servidor real (modo «lento» para probar el autoguardado).
+const LATENCY = Number(import.meta.env.VITE_FAKE_LATENCY ?? 120) || 120;
+const delay = () => new Promise<void>((r) => setTimeout(r, LATENCY));
 
 export class LocalStore implements ContentStore {
   private state: State;

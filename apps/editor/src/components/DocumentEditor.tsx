@@ -30,41 +30,69 @@ export function DocumentEditor({ docId, type, types }: Props) {
   const [train, setTrain] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const rev = useRef(0);
-  const dirty = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // Guardado en fila: nunca hay dos guardados en camino a la vez (en producción cada uno tarda ~1 s),
+  // y siempre se envía lo último escrito. Así el servidor no confunde nuestros propios guardados con otra pestaña.
+  const latest = useRef<DocData | null>(null);
+  const edits = useRef(0);       // cambios hechos en pantalla
+  const savedEdits = useRef(0);  // cambios ya confirmados por el servidor
+  const inFlight = useRef(false);
+  const chain = useRef<Promise<void>>(Promise.resolve());
+  const isDirty = () => edits.current !== savedEdits.current;
 
-  // Sincroniza con lo guardado cuando no hay cambios locales pendientes.
+  // Sincroniza con lo guardado solo cuando no hay nada nuestro pendiente ni en camino.
   useEffect(() => {
-    if (!doc) return;
-    if (!dirty.current) { setData(workingData(doc)); rev.current = doc.rev; }
-    else if (doc.rev !== rev.current) setConflict(doc);
+    if (!doc || inFlight.current) return;
+    if (doc.rev < rev.current) return; // respuesta vieja de una consulta que llegó tarde
+    if (!isDirty()) { setData(workingData(doc)); latest.current = workingData(doc); rev.current = doc.rev; }
+    else if (doc.rev > rev.current) setConflict(doc); // de verdad alguien más guardó encima
   }, [doc]);
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  const save = async (next: DocData) => {
-    setSaving(true);
-    try {
-      const d = await store.updateDraft(docId, next, rev.current);
-      rev.current = d.rev; dirty.current = false;
-      setSavedAt(d.updatedAt);
-    } catch (e) {
-      if (e instanceof ConflictError) setConflict(e.current); else toast((e as Error).message, 'error');
-    } finally { setSaving(false); }
+  const enqueueSave = () => {
+    chain.current = chain.current.then(async () => {
+      if (!isDirty() || !latest.current) return;
+      const upTo = edits.current;
+      inFlight.current = true; setSaving(true);
+      try {
+        const d = await store.updateDraft(docId, latest.current, rev.current);
+        rev.current = d.rev; savedEdits.current = upTo;
+        setSavedAt(d.updatedAt);
+      } catch (e) {
+        if (e instanceof ConflictError) setConflict(e.current); else toast((e as Error).message, 'error');
+      } finally {
+        inFlight.current = false; setSaving(false);
+      }
+      // Si siguió escribiendo mientras se guardaba, se guarda lo nuevo enseguida.
+      if (isDirty() && !timer.current) enqueueSave();
+    });
+    return chain.current;
   };
 
   const change = (key: string, value: unknown) => {
     setData((prev) => {
       const next = { ...(prev ?? {}), [key]: value };
-      dirty.current = true;
+      latest.current = next;
+      edits.current += 1;
       clearTimeout(timer.current);
-      timer.current = setTimeout(() => void save(next), 500);
+      timer.current = setTimeout(() => { timer.current = undefined; void enqueueSave(); }, 600);
       return next;
     });
   };
 
   const flush = async () => {
-    if (dirty.current && data) { clearTimeout(timer.current); await save(data); }
+    clearTimeout(timer.current); timer.current = undefined;
+    await enqueueSave();
+  };
+
+  /** Conflicto real: conservar lo escrito aquí y guardarlo encima de la otra versión. */
+  const keepMine = async () => {
+    if (!conflict) return;
+    rev.current = conflict.rev; setConflict(null);
+    edits.current += 1;
+    await flush();
+    toast('Tus cambios se guardaron encima de la otra versión.');
   };
 
   if (loadError) return <div className="editor-inner"><div className="banner danger"><TriangleAlert className="lucide" /><div><strong>No se pudo abrir el documento</strong>{loadError.message}</div></div></div>;
@@ -76,7 +104,7 @@ export function DocumentEditor({ docId, type, types }: Props) {
   const errorKeys = type.fields.filter((f) => errors[f.key]).map((f) => f.key);
   // Si hay cambios locales sin guardar, el estado editorial es «cambios» aunque el servidor no lo sepa aún.
   const serverState = docState(doc, site?.lastBuiltAt ?? null);
-  const state: DocState = dirty.current && doc.published ? 'changed' : serverState;
+  const state: DocState = isDirty() && doc.published ? 'changed' : serverState;
   const title = docTitle(type, { ...doc, draft: current });
 
   // Lleva al primer campo que falta. Es un control aparte: el botón Publicar nunca cambia de función.
@@ -104,12 +132,12 @@ export function DocumentEditor({ docId, type, types }: Props) {
   };
 
   const act = async (fn: () => Promise<unknown>, msg: string) => {
-    try { await fn(); dirty.current = false; toast(msg); } catch (e) { toast((e as Error).message, 'error'); }
+    try { await flush(); await fn(); savedEdits.current = edits.current; toast(msg); } catch (e) { toast((e as Error).message, 'error'); }
   };
 
   const reloadFromServer = () => {
     if (!conflict) return;
-    dirty.current = false; rev.current = conflict.rev; setData(workingData(conflict)); setConflict(null);
+    savedEdits.current = edits.current; rev.current = conflict.rev; setData(workingData(conflict)); latest.current = workingData(conflict); setConflict(null);
   };
 
   const canPublish = !errorKeys.length && (state === 'draft' || state === 'changed');
@@ -157,8 +185,8 @@ export function DocumentEditor({ docId, type, types }: Props) {
       {conflict && (
         <div className="banner" role="alert">
           <TriangleAlert className="lucide" aria-hidden="true" />
-          <div><strong>Otra pestaña guardó cambios en este documento</strong><span className="muted">Para no sobrescribirlos, recarga la versión guardada. Tus últimos cambios aquí se perderán.</span></div>
-          <div className="acts"><button className="btn btn-primary btn-sm" type="button" onClick={reloadFromServer}>Recargar</button></div>
+          <div><strong>Este documento se guardó desde otra pestaña o equipo</strong><span className="muted">Elige qué versión quedarse: la que tienes en pantalla o la que se guardó allá.</span></div>
+          <div className="acts"><button className="btn btn-primary btn-sm" type="button" onClick={() => void keepMine()}>Conservar mis cambios</button><button className="btn btn-secondary btn-sm" type="button" onClick={reloadFromServer}>Usar la otra versión</button></div>
         </div>
       )}
 
