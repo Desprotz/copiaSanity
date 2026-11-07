@@ -341,3 +341,26 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .login-logo { height: 28px; width: auto; }
 [data-theme="dark"] .login-logo { content: url(/logo-mse-blanco.svg); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .login-logo { content: url(/logo-mse-blanco.svg); } }
+
+/* Importar datos (Strapi, JSON, CSV) */
+.imp-help { margin-bottom: var(--cms-space-6); color: var(--cms-color-text-muted); }
+.imp-help summary { cursor: pointer; font-weight: 700; color: var(--cms-color-text); min-height: 32px; display: flex; align-items: center; }
+.imp-help ol { margin: var(--cms-space-3) 0 0; padding-left: var(--cms-space-6); display: grid; gap: var(--cms-space-3); }
+.imp-help code { font-family: var(--cms-font-mono); font-size: var(--cms-text-xs); overflow-wrap: anywhere; }
+.imp-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--cms-space-4); margin-bottom: var(--cms-space-5); }
+.imp-head h2 { margin-bottom: var(--cms-space-1); }
+.imp-cols { display: grid; }
+.imp-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr) minmax(0, 1.2fr) 96px minmax(0, 1fr); gap: var(--cms-space-4); align-items: center; padding: var(--cms-space-3) 0; border-top: 1px solid var(--cms-color-border); }
+.imp-row .control input, .imp-row .control select { padding: 6px 10px; font-size: var(--cms-text-sm); }
+.imp-row.off .imp-src { text-decoration: line-through; color: var(--cms-color-text-muted); }
+.imp-th { border-top: 0; font-size: var(--cms-text-xs); font-weight: 700; color: var(--cms-color-text-muted); text-transform: uppercase; letter-spacing: .04em; }
+.imp-src, .imp-sample { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.imp-kind { display: grid; gap: var(--cms-space-2); }
+.imp-links { display: flex; flex-wrap: wrap; gap: var(--cms-space-3); margin-top: var(--cms-space-5); }
+.imp-progress { height: 6px; border-radius: 3px; background: var(--cms-color-surface); overflow: hidden; margin-bottom: var(--cms-space-4); }
+.imp-progress span { display: block; height: 100%; background: var(--cms-color-accent); transition: width var(--cms-duration-base) var(--cms-ease); }
+@media (max-width: 899px) {
+  .imp-th { display: none; }
+  .imp-row { grid-template-columns: 1fr 1fr; }
+  .imp-row > :first-child, .imp-sample { grid-column: 1 / -1; }
+}

@@ -1,5 +1,5 @@
 import type { ContentStore } from './store';
-import { ConflictError, type Asset, type CmsDocument, type ContentType, type DocData, type Site, type SiteSnapshot, type SiteStatus } from './types';
+import { ConflictError, type Asset, type CmsDocument, type ContentType, type DocData, type ImportBatch, type ImportResult, type Site, type SiteSnapshot, type SiteStatus } from './types';
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch('/api/v1' + path, { ...init, headers: { 'content-type': 'application/json', 'x-cms': '1' }, credentials: 'same-origin' }).catch(() => { throw new Error('Sin conexión con el servidor.'); });
@@ -91,6 +91,8 @@ export class ApiStore implements ContentStore {
   siteStatus() { return this.req<SiteStatus>('/site/status'); }
   buildSiteNow() { return this.write(this.req<void>('/site/build', { method: 'POST' })); }
   siteSnapshot() { return this.req<SiteSnapshot | null>('/site/snapshot'); }
+
+  importContent(batch: ImportBatch) { return this.write(this.req<ImportResult>('/import', { method: 'POST', body: JSON.stringify(batch) })); }
 
   resetDemo() { return this.write(this.req<void>('/demo/reset', { method: 'POST' })); }
 

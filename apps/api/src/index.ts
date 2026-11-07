@@ -225,6 +225,18 @@ app.post('/s/:site/documents/:id/unpublish', async (c) => { const d = await repo
 app.post('/s/:site/documents/:id/duplicate', async (c) => c.json(await repo.duplicate(c.var.sql, c.var.ctx, param(c, 'id')), 201));
 app.delete('/s/:site/documents/:id', async (c) => { await repo.deleteDocument(c.var.sql, c.var.ctx, param(c, 'id')); await flagBuild(c.env); return c.body(null, 204); });
 
+// Importación: tipos + documentos en una transacción. El navegador parte los lotes grandes (máx. 200 documentos por envío).
+const importBatch = z.object({
+  types: z.array(contentType).max(50),
+  documents: z.array(z.object({ id, typeId: id, data: docData, publish: z.boolean() })).max(200),
+}).refine((b) => new Set(b.documents.map((d) => d.id)).size === b.documents.length, 'Hay documentos repetidos en el lote.');
+app.post('/s/:site/import', async (c) => {
+  const b = await body(c, importBatch);
+  const r = await repo.importContent(c.var.sql, c.var.ctx, { types: b.types.map((t) => ({ ...t, version: t.version ?? 0 })), documents: b.documents });
+  if (r.published) await flagBuild(c.env);
+  return c.json(r, 201);
+});
+
 const MAGIC: Record<string, (b: Uint8Array) => boolean> = {
   'image/webp': (b) => b.length > 12 && String.fromCharCode(...b.slice(0, 4)) === 'RIFF' && String.fromCharCode(...b.slice(8, 12)) === 'WEBP',
   'image/jpeg': (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff,

@@ -1,4 +1,4 @@
-import type { Asset, CmsDocument, ContentType, DocData, SiteSnapshot, SiteStatus } from './types';
+import type { Asset, CmsDocument, ContentType, DocData, ImportBatch, ImportResult, SiteSnapshot, SiteStatus } from './types';
 
 /**
  * Contrato de la capa de datos. La implementación local (local-store.ts) guarda todo en el
@@ -31,6 +31,12 @@ export interface ContentStore {
   /** Pide compilar el sitio ya, sin esperar el agrupamiento. */
   buildSiteNow(): Promise<void>;
   siteSnapshot(): Promise<SiteSnapshot | null>;
+
+  /**
+   * Importa un lote en una sola operación: guarda los tipos y crea los documentos. Con publish, solo se
+   * publican los que pasan la validación; los demás quedan como borrador.
+   */
+  importContent(batch: ImportBatch): Promise<ImportResult>;
 
   resetDemo(): Promise<void>;
   /** Avisa cuando algo cambia (en esta pestaña o en otra). Devuelve la función para dejar de escuchar. */
