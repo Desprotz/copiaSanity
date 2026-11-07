@@ -24,7 +24,7 @@ const toDoc = (r: Row): CmsDocument => ({
   rev: r.rev as number, createdAt: iso(r.created_at)!, updatedAt: iso(r.updated_at)!, publishedAt: iso(r.published_at),
 });
 const toType = (r: Row): ContentType => ({ id: r.id as string, name: r.name as string, plural: r.plural as string, color: r.color as ContentType['color'], titleField: r.title_field as string, fields: r.fields as ContentType['fields'], version: r.version as number });
-const toSite = (r: Row): Site => ({ id: r.id as string, name: r.name as string, createdAt: iso(r.created_at)! });
+const toSite = (r: Row): Site => ({ id: r.id as string, name: r.name as string, createdAt: iso(r.created_at)!, publicUrl: (r.public_url as string | null) ?? null });
 
 const audit = (db: Db, c: Ctx, action: string, target?: string, detail?: unknown) =>
   db`insert into cms.audit_events (site_id, actor, action, target, detail) values (${c.site}, ${c.actor}, ${action}, ${target ?? null}, ${detail === undefined ? null : db.json(detail as never)})`;
@@ -265,13 +265,14 @@ async function writeBuild(tx: TransactionSql, site: string, initial = false) {
 }
 
 /** Compila un sitio (o, sin sitio, todos los que tengan publicaciones vencidas: lo usa el Cron Trigger). */
-export async function maybeBuild(sql: Sql, site?: string, force = false): Promise<number> {
+/** Devuelve los sitios que se compilaron, para publicarlos en KV. */
+export async function maybeBuild(sql: Sql, site?: string, force = false): Promise<string[]> {
   return sql.begin(async (tx) => {
     const due = site
       ? await tx`select site_id from cms.site_state where site_id = ${site} and pending > 0 and (${force} or next_build_at <= now()) for update skip locked`
       : await tx`select site_id from cms.site_state where pending > 0 and next_build_at <= now() for update skip locked`;
     for (const r of due) await writeBuild(tx, r.site_id as string);
-    return due.length;
+    return due.map((r) => r.site_id as string);
   });
 }
 

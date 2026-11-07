@@ -38,6 +38,29 @@ async function flagBuild(env: Env) {
   if (!prev || at < prev) await env.FLAGS.put('build-due', String(at));
 }
 
+/**
+ * Publica la última compilación de un sitio en KV: la web pública (otro Worker) lee de ahí y nunca toca Neon.
+ * Las fotos referenciadas se copian una sola vez (KV: 1.000 escrituras/día en el plan gratuito).
+ */
+async function exportBuild(sql: Sql, env: Env, site: string) {
+  if (!env.FLAGS) return;
+  const snap = await repo.latestSnapshot(sql, { site, actor: 'build', batchSeconds: 0 });
+  if (!snap) return;
+  const ids = new Set<string>();
+  JSON.stringify(snap.documents, (_k, v) => { if (v && typeof v === 'object' && typeof v.assetId === 'string') ids.add(v.assetId); return v; });
+  for (const id of ids) {
+    const key = `pub:${site}:img:${id}`;
+    if (await env.FLAGS.get(key, 'stream')) continue;
+    const a = await repo.getAssetContent(sql, { site, actor: 'build', batchSeconds: 0 }, id);
+    if (a) await env.FLAGS.put(key, a.content, { metadata: { mime: a.mime } });
+  }
+  await env.FLAGS.put(`pub:${site}:snapshot`, JSON.stringify(snap));
+}
+
+async function buildAndExport(sql: Sql, env: Env, site?: string, force = false) {
+  for (const s of await repo.maybeBuild(sql, site, force)) await exportBuild(sql, env, s);
+}
+
 const batch = (env: Env) => Math.max(1, Math.min(3600, Number(env.BUILD_BATCH_SECONDS ?? 300) || 300));
 
 // Identidad: inicio de sesión propio (src/auth.ts). Sin sesión válida, todo lo que no sea /auth responde 401.
@@ -142,7 +165,7 @@ app.use('/s/:site/*', async (c, next) => {
 
 
 app.get('/s/:site/changes', async (c) => {
-  await repo.maybeBuild(c.var.sql, c.var.ctx.site);
+  await buildAndExport(c.var.sql, c.env, c.var.ctx.site);
   const s = await repo.siteStatus(c.var.sql, c.var.ctx);
   return c.json({ seq: s.changeSeq });
 });
@@ -206,11 +229,16 @@ app.get('/s/:site/assets/:id/content', async (c) => {
 });
 
 app.get('/s/:site/site/status', async (c) => {
-  await repo.maybeBuild(c.var.sql, c.var.ctx.site);
+  await buildAndExport(c.var.sql, c.env, c.var.ctx.site);
   const { changeSeq: _ignored, ...status } = await repo.siteStatus(c.var.sql, c.var.ctx);
   return c.json(status);
 });
-app.post('/s/:site/site/build', async (c) => { await repo.maybeBuild(c.var.sql, c.var.ctx.site, true); return c.body(null, 204); });
+app.post('/s/:site/site/build', async (c) => {
+  await buildAndExport(c.var.sql, c.env, c.var.ctx.site, true);
+  // También republica aunque no hubiera cambios pendientes (útil la primera vez que se conecta una web).
+  await exportBuild(c.var.sql, c.env, c.var.ctx.site);
+  return c.body(null, 204);
+});
 app.get('/s/:site/site/snapshot', async (c) => c.json(await repo.latestSnapshot(c.var.sql, c.var.ctx)));
 
 app.post('/s/:site/demo/reset', async (c) => { await repo.resetDemo(c.var.sql, c.var.ctx); return c.body(null, 204); });
@@ -227,7 +255,7 @@ export default {
     const sql = connect(env);
     ctx.waitUntil((async () => {
       try {
-        await repo.maybeBuild(sql);
+        await buildAndExport(sql, env);
         const [{ n }] = await sql`select count(*)::int as n from cms.site_state where pending > 0`;
         if (n === 0) await env.FLAGS?.delete('build-due');
         else await env.FLAGS?.put('build-due', String(Date.now() + 60_000));

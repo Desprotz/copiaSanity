@@ -20,6 +20,7 @@ function isDark() {
 export function SiteBeacon() {
   const store = useStore();
   const toast = useToast();
+  const { site } = useSites();
   const { data: s } = useLive((st) => st.siteStatus(), []);
   if (!s) return <span className="beacon-btn" aria-hidden="true"><span className="beacon calm" /></span>;
   const tone = s.building ? 'building' : s.pending ? '' : 'calm';
@@ -28,7 +29,7 @@ export function SiteBeacon() {
   const time = s.building ? '' : s.pending ? `próximo al sitio ${formatTime(s.nextBuildAt)}` : s.lastBuiltAt ? `compilado ${formatTime(s.lastBuiltAt)}` : '';
   const onClick = async () => {
     if (s.pending && !s.building) { await store.buildSiteNow(); toast('El sitio público ya muestra los cambios.'); }
-    else window.open('/sitio', '_blank', 'noopener');
+    else window.open(site?.publicUrl ?? '/sitio', '_blank', 'noopener');
   };
   return (
     <button type="button" className="beacon-btn" onClick={onClick} title={s.pending ? 'Actualizar el sitio ahora' : 'Abrir el sitio publicado'} aria-live="polite">
@@ -158,7 +159,7 @@ export function Shell() {
         <NavLink className="route" to="/modelos" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
           <span className="ln" aria-hidden="true" /><span className="lbl">Tipos de contenido</span>
         </NavLink>
-        <a className="route" href="/sitio" target="_blank" rel="noopener" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
+        <a className="route" href={site?.publicUrl ?? '/sitio'} target="_blank" rel="noopener" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
           <span className="ln" aria-hidden="true" /><span className="lbl">Ver el sitio</span>
         </a>
         {(!site || DEMO_IDS.includes(site.id)) && <div className="foot"><button type="button" onClick={reset}>Restaurar datos de prueba</button></div>}

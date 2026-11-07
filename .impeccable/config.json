@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "archivo",
+        "createdAt": "2026-11-07T11:10:42.163Z",
+        "reason": "Claude: Archivo es la tipografía de la tienda de prueba Telar Norte (web de cliente con identidad propia); DESIGN.md describe solo el editor del CMS"
+      }
+    ]
+  }
+}
