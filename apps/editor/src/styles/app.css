@@ -391,3 +391,16 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .imp-row { grid-template-columns: 1fr 1fr; }
   .imp-row > :first-child, .imp-sample { grid-column: 1 / -1; }
 }
+/* Usuarios y asignaciones: controles cómodos también en pantallas pequeñas. */
+.profile-fields { border: 0; padding: 0; margin: 0; display: grid; gap: var(--cms-space-6); }
+.profile-sites { border: 1px solid var(--cms-color-border); border-radius: var(--cms-radius-md); padding: var(--cms-space-5); }
+.profile-sites label, .profile-check { display: flex; align-items: center; gap: 12px; min-height: 44px; cursor: pointer; }
+.profile-sites input, .profile-check input { width: 18px; height: 18px; flex-shrink: 0; }
+.administration { display: grid; grid-template-rows: auto auto minmax(0, 1fr); height: 100dvh; }
+.administration > .topbar { min-height: var(--cms-layout-topbar); flex-wrap: wrap; padding-block: var(--cms-space-3); }
+.administration > .topbar > a { margin-left: auto; }
+.administration .page-inner { margin-inline: auto; }
+.admin-nav { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cms-space-5); padding: var(--cms-space-3) var(--cms-space-6); background: var(--cms-color-surface-raised); border-bottom: 1px solid var(--cms-color-border); }
+.admin-nav a { padding: var(--cms-space-4); color: var(--cms-color-text); text-decoration: none; }
+.admin-nav a.active { font-weight: 700; box-shadow: inset 0 -3px var(--cms-color-focus); }
+.admin-nav button { margin-left: auto; }

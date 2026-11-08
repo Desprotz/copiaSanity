@@ -1,5 +1,6 @@
 // Crea (o cambia la contraseña de) un usuario del CMS. La contraseña se escribe sin mostrarse y Postgres guarda solo su hash bcrypt.
-// Uso: npm run user -w apps/api            → usuario dueño (ve todos los sitios)
+// Herramienta de recuperación de confianza: acceso directo a la base. No se expone a Admins.
+// Uso: npm run user -w apps/api            → Super Admin (ve todos los sitios)
 //      npm run user -w apps/api -- --cliente → usuario sin sitios asignados (para clientes, más adelante)
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -46,13 +47,13 @@ const username = (await ask('Usuario (minúsculas, sin espacios, ej. juan): ')).
 if (!/^[a-z0-9._-]{3,40}$/.test(username)) { console.error('El usuario debe tener 3–40 caracteres: letras minúsculas, números, punto, guion.'); process.exit(1); }
 const displayName = (await ask('Nombre para mostrar (ej. Juan): ')).trim() || username;
 const p1 = await askHidden('Contraseña, mínimo 10 caracteres ');
-if (p1.length < 10) { console.error('Muy corta: usa al menos 10 caracteres. Una frase de varias palabras funciona bien.'); process.exit(1); }
+if (p1.length < 10 || Buffer.byteLength(p1, 'utf8') > 72) { console.error('Usa al menos 10 caracteres y como máximo 72 bytes UTF-8.'); process.exit(1); }
 const p2 = await askHidden('Repite la contraseña ');
 if (p1 !== p2) { console.error('Las contraseñas no coinciden. No se guardó nada.'); process.exit(1); }
 
 const sql = postgres(url, { max: 1, onnotice: () => {} });
 try {
-  await sql`insert into cms.users (username, display_name, password_hash, is_owner) values (${username}, ${displayName}, crypt(${p1}, gen_salt('bf', 12)), ${owner})
+  await sql`insert into cms.users (username, display_name, password_hash, is_owner, role) values (${username}, ${displayName}, crypt(${p1}, gen_salt('bf', 12)), ${owner}, ${owner ? 'super_admin' : 'site_owner'})
     on conflict (username) do update set password_hash = excluded.password_hash, display_name = excluded.display_name, disabled_at = null`;
   // Cambiar la contraseña cierra las sesiones abiertas de ese usuario.
   await sql`delete from cms.sessions where user_id = (select id from cms.users where username = ${username})`;

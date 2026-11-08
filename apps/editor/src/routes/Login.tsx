@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { TriangleAlert } from 'lucide-react';
 
-export interface Me { id: number; username: string; displayName: string; isOwner: boolean }
+export type UserRole = 'super_admin' | 'admin' | 'site_owner';
+export interface Me { id: number; username: string; displayName: string; role: UserRole; isOwner: boolean }
 interface AuthValue { me: Me; logout: () => Promise<void> }
 const AuthContext = createContext<AuthValue | null>(null);
 export const useAuth = () => useContext(AuthContext);

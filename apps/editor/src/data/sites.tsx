@@ -11,7 +11,8 @@ interface SitesValue {
   /** El origen de datos admite varios sitios (API) o solo uno (este navegador). */
   multi: boolean;
   select: (id: string) => void;
-  create: (name: string) => Promise<Site>;
+  create: (name: string, publicUrl?: string) => Promise<Site>;
+  updateUrl: (id: string, url: string) => Promise<void>;
   remove: (id: string, confirm: string) => Promise<void>;
 }
 
@@ -29,11 +30,12 @@ function slug(name: string) {
 export function SitesProvider({ api, children }: { api: boolean; children: ReactNode }) {
   const [sites, setSites] = useState<Site[]>(api ? [] : [LOCAL_SITE]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(api);
   const [siteId, setSiteId] = useState<string | null>(() => { try { return localStorage.getItem(KEY); } catch { return null; } });
 
   const load = useCallback(async () => {
     if (!api) return;
-    try { setSites(await sitesApi.list()); setError(''); } catch (e) { setError((e as Error).message); }
+    try { setSites(await sitesApi.list()); setError(''); } catch (e) { setError((e as Error).message); } finally { setLoading(false); }
   }, [api]);
   useEffect(() => { void load(); }, [load]);
 
@@ -46,11 +48,11 @@ export function SitesProvider({ api, children }: { api: boolean; children: React
     try { localStorage.setItem(KEY, id); } catch { /* sin almacenamiento */ }
   }, []);
 
-  const create = useCallback(async (name: string) => {
+  const create = useCallback(async (name: string, publicUrl = '') => {
     let id = slug(name);
     if (id.length < 2) id = `${id}-web`;
     if (sites.some((s) => s.id === id)) id = `${id}-${Math.random().toString(36).slice(2, 6)}`.slice(0, 40);
-    const s = await sitesApi.create(id, name.trim());
+    const s = await sitesApi.create(id, name.trim(), publicUrl);
     await load();
     select(s.id);
     return s;
@@ -62,10 +64,14 @@ export function SitesProvider({ api, children }: { api: boolean; children: React
     await load();
   }, [site?.id, load]);
 
-  const value = useMemo(() => ({ sites, site, multi: api, select, create, remove }), [sites, site, api, select, create, remove]);
+  const updateUrl = useCallback(async (id: string, url: string) => {
+    const updated = await sitesApi.updateUrl(id, url);
+    setSites((current) => current.map((s) => s.id === id ? updated : s));
+  }, []);
+  const value = useMemo(() => ({ sites, site, multi: api, select, create, remove, updateUrl }), [sites, site, api, select, create, remove, updateUrl]);
 
   if (error) return <div className="empty" style={{ paddingTop: 96 }}><strong>No se pudo conectar con el API</strong><span>{error}</span><span className="muted">¿Está corriendo <code>npm run dev:api</code>?</span><button className="btn btn-secondary" type="button" onClick={() => void load()}>Reintentar</button></div>;
-  if (!store || !site) return <div className="empty" style={{ paddingTop: 96 }} aria-busy="true"><span className="spinner" aria-hidden="true" /><span>Cargando tus sitios…</span></div>;
+  if (loading) return <div className="empty" style={{ paddingTop: 96 }} aria-busy="true"><span className="spinner" aria-hidden="true" /><span>Cargando tus sitios…</span></div>;
 
   return (
     <SitesContext.Provider value={value}>

@@ -7,6 +7,8 @@ import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import * as auth from './auth';
 import * as repo from './repo';
 import * as tokens from './tokens';
+import * as users from './users';
+import { validPublicUrl } from './permissions';
 import { HttpError } from './repo';
 
 export interface Env {
@@ -147,6 +149,26 @@ const param = (c: Context, name: string) => id.parse(c.req.param(name));
 // ---------- Rutas ----------
 
 const siteId = z.string().regex(/^[a-z0-9-]{2,40}$/);
+const publicUrl = z.string().trim().max(2048).refine(validPublicUrl, 'Escribe una URL http:// o https:// sin credenciales.');
+const profile = z.object({
+  displayName: z.string().trim().min(1).max(80),
+  role: z.enum(['admin', 'site_owner']),
+  siteIds: z.array(siteId).max(500).refine((ids) => new Set(ids).size === ids.length),
+  disabled: z.boolean().default(false),
+});
+app.get('/users', async (c) => c.json(await users.listUsers(c.var.sql, c.var.user)));
+app.post('/users', async (c) => {
+  const input = await body(c, profile.extend({
+    username: z.string().trim().toLowerCase().regex(/^[a-z0-9._-]{3,40}$/),
+    password: z.string().min(10).refine((s) => new TextEncoder().encode(s).length <= 72, 'La contraseña admite hasta 72 bytes.'),
+  }));
+  return c.json(await users.createUser(c.var.sql, c.var.user, input), 201);
+});
+app.patch('/users/:id', async (c) => {
+  const id = z.coerce.number().int().positive().safe().parse(c.req.param('id'));
+  await users.updateUser(c.var.sql, c.var.user, id, await body(c, profile.extend({ disabled: z.boolean() }).partial().strict().refine((v) => Object.keys(v).length > 0, 'No hay cambios.')));
+  return c.body(null, 204);
+});
 
 app.post('/auth/login', async (c) => {
   const { username, password } = await body(c, z.object({ username: z.string().trim().toLowerCase().min(1).max(40), password: z.string().min(1).max(200) }));
@@ -166,20 +188,27 @@ app.get('/auth/me', async (c) => {
 });
 
 app.get('/sites', async (c) => {
-  await repo.ensureSeeded(c.var.sql, c.var.actor);
+  if (c.var.user.role === 'super_admin') await repo.ensureSeeded(c.var.sql, c.var.actor);
   const all = await repo.listSites(c.var.sql);
   const mine = [];
   for (const s of all) if (await auth.canUseSite(c.var.sql, c.var.user, s.id)) mine.push(s);
   return c.json(mine);
 });
 app.post('/sites', async (c) => {
-  if (!c.var.user.isOwner) throw new HttpError(403, 'Solo el dueño de la cuenta puede crear sitios.');
-  const { id, name } = await body(c, z.object({ id: siteId, name: z.string().trim().min(1).max(80) }));
-  return c.json(await repo.createSite(c.var.sql, id, name, c.var.actor), 201);
+  if (c.var.user.role !== 'super_admin') throw new HttpError(403, 'Solo el Super Admin puede crear sitios.');
+  const { id, name, publicUrl: url } = await body(c, z.object({ id: siteId, name: z.string().trim().min(1).max(80), publicUrl: publicUrl.default('') }));
+  return c.json(await repo.createSite(c.var.sql, id, name, c.var.actor, url || null), 201);
+});
+
+app.patch('/sites/:id', async (c) => {
+  const id = siteId.parse(c.req.param('id'));
+  if (!(await auth.canUseSite(c.var.sql, c.var.user, id))) throw new HttpError(404, 'Ese sitio no existe.');
+  const { publicUrl: url } = await body(c, z.object({ publicUrl }));
+  return c.json(await repo.updatePublicUrl(c.var.sql, id, url || null, c.var.actor));
 });
 
 app.delete('/sites/:id', async (c) => {
-  if (!c.var.user.isOwner) throw new HttpError(403, 'Solo el dueño de la cuenta puede eliminar sitios.');
+  if (c.var.user.role !== 'super_admin') throw new HttpError(403, 'Solo el Super Admin puede eliminar sitios.');
   const id = siteId.parse(c.req.param('id'));
   const { confirm } = await body(c, z.object({ confirm: z.string() }));
   const [s] = await c.var.sql`select name from cms.sites where id = ${id}`;
@@ -198,12 +227,12 @@ app.delete('/sites/:id', async (c) => {
   return c.body(null, 204);
 });
 
-// Tokens de API (JWT) de un sitio: solo el dueño los crea, lista y revoca. El JWT se muestra una sola vez.
+// Tokens de API: Super Admin global o Admin asignado al sitio. El JWT se muestra una sola vez.
 const tokenId = z.string().regex(/^tok_[a-z0-9]{16,32}$/);
 async function ownerSite(c: Context<{ Bindings: Env; Variables: Vars }>) {
-  if (!c.var.user?.isOwner) throw new HttpError(403, 'Solo el dueño de la cuenta puede gestionar tokens de API.');
+  if (!c.var.user || c.var.user.role === 'site_owner') throw new HttpError(403, 'Solo los administradores pueden gestionar tokens de API.');
   const site = siteId.parse(c.req.param('id'));
-  if (!(await repo.siteExists(c.var.sql, site))) throw new HttpError(404, 'Ese sitio no existe.');
+  if (!(await auth.canUseSite(c.var.sql, c.var.user, site)) || !(await repo.siteExists(c.var.sql, site))) throw new HttpError(404, 'Ese sitio no existe.');
   return site;
 }
 app.get('/sites/:id/tokens', async (c) => c.json(await tokens.listTokens(c.var.sql, await ownerSite(c))));

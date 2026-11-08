@@ -48,11 +48,11 @@ export async function listSites(sql: Sql) { return (await sql`select * from cms.
 export async function siteExists(sql: Sql, id: string) { const [r] = await sql`select 1 from cms.sites where id = ${id}`; return Boolean(r); }
 
 /** Crea un sitio vacío con un tipo «Página» para empezar. */
-export async function createSite(sql: Sql, id: string, name: string, actor: string) {
+export async function createSite(sql: Sql, id: string, name: string, actor: string, publicUrl: string | null = null) {
   return sql.begin(async (tx) => {
     const [exists] = await tx`select 1 from cms.sites where id = ${id}`;
     if (exists) throw new HttpError(409, 'Ya existe un sitio con esa dirección. Elige otro nombre.');
-    const [r] = await tx`insert into cms.sites (id, name) values (${id}, ${name}) returning *`;
+    const [r] = await tx`insert into cms.sites (id, name, public_url) values (${id}, ${name}, ${publicUrl}) returning *`;
     await tx`insert into cms.site_state (site_id) values (${id})`;
     const fields = [{ key: 'titulo', label: 'Título', kind: 'string', required: true }, { key: 'cuerpo', label: 'Texto', kind: 'richtext', required: false }];
     await tx`insert into cms.content_types (site_id, id, name, plural, color, title_field, fields) values (${id}, 'pagina', 'Página', 'Páginas', 'blue', 'titulo', ${tx.json(fields as never)})`;
@@ -62,6 +62,15 @@ export async function createSite(sql: Sql, id: string, name: string, actor: stri
 }
 
 /** Borra el sitio y, en cascada, sus tipos, documentos, historial, imágenes y compilaciones. */
+export async function updatePublicUrl(sql: Sql, id: string, publicUrl: string | null, actor: string) {
+  return sql.begin(async (tx) => {
+    const [r] = await tx`update cms.sites set public_url = ${publicUrl} where id = ${id} returning *`;
+    if (!r) throw new HttpError(404, 'Ese sitio no existe.');
+    await audit(tx, { site: id, actor, batchSeconds: 0 }, 'site.url.update', id);
+    return toSite(r);
+  });
+}
+
 export async function deleteSite(sql: Sql, id: string, actor: string) {
   await sql.begin(async (tx) => {
     const [r] = await tx`delete from cms.sites where id = ${id} returning id`;

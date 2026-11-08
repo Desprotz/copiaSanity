@@ -6,7 +6,7 @@ import { useSites } from '../data/sites';
 import { useToast } from '../components/ui';
 import { useAuth } from './Login';
 
-// Tokens de API por sitio: el administrador (hoy, el dueño de la cuenta) los crea para que la web del cliente
+// Tokens de API por sitio: el Super Admin o Admin asignado los crea para que la web del cliente
 // consulte su contenido publicado con Authorization: Bearer, sin usuario ni contraseña.
 
 const EXPIRY = [
@@ -29,7 +29,7 @@ export function ApiAccessPage() {
   const { site } = useSites();
   const auth = useAuth();
   const toast = useToast();
-  const isOwner = Boolean(auth?.me.isOwner);
+  const isOwner = Boolean(auth && auth.me.role !== 'site_owner');
   const [tokens, setTokens] = useState<ApiToken[] | null>(null);
   const [loadErr, setLoadErr] = useState('');
   const [name, setName] = useState('');

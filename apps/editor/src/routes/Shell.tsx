@@ -7,7 +7,7 @@ import { SEED_SITES } from '../data/seed';
 /** Solo los sitios de prueba (y el modo sin conexión) se pueden restaurar. */
 const DEMO_IDS = ['local', ...SEED_SITES.map((s) => s.id)];
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { formatTime } from '../data/domain';
 import { useLive, useStore } from '../data/hooks';
 import { LINE_VAR, useToast } from '../components/ui';
@@ -18,6 +18,7 @@ function isDark() {
 }
 
 export function SiteBeacon() {
+  const navigate = useNavigate();
   const store = useStore();
   const toast = useToast();
   const { site } = useSites();
@@ -29,7 +30,8 @@ export function SiteBeacon() {
   const time = s.building ? '' : s.pending ? `próximo al sitio ${formatTime(s.nextBuildAt)}` : s.lastBuiltAt ? `compilado ${formatTime(s.lastBuiltAt)}` : '';
   const onClick = async () => {
     if (s.pending && !s.building) { await store.buildSiteNow(); toast('El sitio público ya muestra los cambios.'); }
-    else window.open(site?.publicUrl ?? '/sitio', '_blank', 'noopener');
+    else if (site?.publicUrl) window.open(site.publicUrl, '_blank', 'noopener,noreferrer');
+    else navigate('/ver-sitio');
   };
   return (
     <button type="button" className="beacon-btn" onClick={onClick} title={s.pending ? 'Actualizar el sitio ahora' : 'Abrir el sitio publicado'} aria-live="polite">
@@ -52,6 +54,7 @@ function SiteSwitcher() {
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
+  const [publicUrl, setPublicUrl] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const env = multi ? 'Neon' : 'este navegador';
@@ -59,7 +62,7 @@ function SiteSwitcher() {
   const submit = async () => {
     if (!name.trim()) { setErr('Escribe el nombre de la web, por ejemplo «Panadería El Trigo».'); return; }
     setBusy(true);
-    try { const s = await create(name); setOpen(false); setName(''); setErr(''); navigate('/'); toast(`Sitio «${s.name}» creado. Empieza definiendo sus tipos de contenido.`); }
+    try { const s = await create(name, publicUrl.trim()); setOpen(false); setName(''); setPublicUrl(''); setErr(''); navigate('/'); toast(`Sitio «${s.name}» creado. Empieza definiendo sus tipos de contenido.`); }
     catch (e) { setErr((e as Error).message); }
     finally { setBusy(false); }
   };
@@ -67,7 +70,7 @@ function SiteSwitcher() {
     <>
       <MenuTrigger>
         <Button className="project" aria-label={`Sitio actual: ${site?.name ?? ''}. Cambiar de sitio`}>
-          <strong>{site?.name}</strong><span className="env" title={multi ? 'Datos en la base de Neon' : 'Datos guardados solo en este navegador'}>{env}</span><ChevronDown className="lucide" aria-hidden="true" />
+          <strong>{site?.name ?? 'Sin sitios'}</strong><span className="env" title={multi ? 'Datos en la base de Neon' : 'Datos guardados solo en este navegador'}>{env}</span><ChevronDown className="lucide" aria-hidden="true" />
         </Button>
         <Popover placement="bottom start" offset={6}>
           <Menu className="menu-pop" aria-label="Tus sitios" onAction={(key) => { if (key === '__new') setOpen(true); else if (key === '__del') { setDelName(''); setDelErr(''); setDelOpen(true); } else if (key === '__api') navigate('/acceso'); else go(String(key)); }}>
@@ -78,8 +81,8 @@ function SiteSwitcher() {
               </MenuItem>
             ))}
             {multi && <Separator className="menu-sep" />}
-            {multi && <MenuItem id="__new" className="menu-item" textValue="Nuevo sitio"><Plus className="lucide" aria-hidden="true" />Nuevo sitio…</MenuItem>}
-            {multi && auth?.me.isOwner && site && <MenuItem id="__api" className="menu-item" textValue="Acceso por API"><KeyRound className="lucide" aria-hidden="true" />Acceso por API…</MenuItem>}
+            {multi && auth?.me.role === 'super_admin' && <MenuItem id="__new" className="menu-item" textValue="Nuevo sitio"><Plus className="lucide" aria-hidden="true" />Nuevo sitio…</MenuItem>}
+            {multi && auth && auth.me.role !== 'site_owner' && site && <MenuItem id="__api" className="menu-item" textValue="Acceso por API"><KeyRound className="lucide" aria-hidden="true" />Acceso por API…</MenuItem>}
             {multi && auth?.me.isOwner && site && <MenuItem id="__del" className="menu-item danger" textValue="Eliminar este sitio"><Trash2 className="lucide" aria-hidden="true" />Eliminar «{site.name}»…</MenuItem>}
           </Menu>
         </Popover>
@@ -121,6 +124,7 @@ function SiteSwitcher() {
                 <div className="control"><input id="site-name" autoFocus value={name} placeholder="Ej.: Panadería El Trigo" maxLength={80} onChange={(e) => setName(e.target.value)} /></div>
                 {err && <span className="err" role="alert">{err}</span>}
               </div>
+              <div className="field"><label htmlFor="new-site-url">Dirección pública (opcional)</label><div className="control"><input id="new-site-url" type="url" maxLength={2048} value={publicUrl} onChange={(e) => setPublicUrl(e.target.value)} placeholder="https://ejemplo.com" /></div><span className="help">Podrás cambiarla después desde Ver sitio.</span></div>
               <div className="acts">
                 <button className="btn btn-ghost" type="button" onClick={() => setOpen(false)}>Cancelar</button>
                 <button className="btn btn-primary" type="submit" disabled={busy}>{busy ? <span className="spinner" aria-hidden="true" /> : null}Crear sitio</button>
@@ -134,6 +138,22 @@ function SiteSwitcher() {
 }
 
 export function Shell() {
+  const { site } = useSites();
+  return site ? <SiteShell key={site.id} /> : <EmptySiteShell />;
+}
+
+function EmptySiteShell() {
+  const auth = useAuth();
+  const location = useLocation();
+  const manager = auth && auth.me.role !== 'site_owner';
+  return <div><header className="topbar"><img className="logo" src="/logo-mse-blanco.svg" alt="MSE" width={81} height={22} />
+    {auth?.me.role === 'super_admin' && <SiteSwitcher />}
+    {manager && <NavLink className="btn btn-secondary" to="/usuarios">Usuarios</NavLink>}
+    <button className="btn btn-secondary" onClick={() => void auth?.logout()}>Cerrar sesión</button>
+  </header>{location.pathname === '/usuarios' && manager ? <Outlet /> : <main className="empty" id="main" style={{ paddingTop: 96 }}><h1>No tienes sitios asignados</h1><p>{auth?.me.role === 'super_admin' ? 'Crea un sitio desde el selector superior.' : 'Pide a tu administrador que te asigne un sitio para empezar.'}</p></main>}</div>;
+}
+
+function SiteShell() {
   const { site } = useSites();
   const auth = useAuth();
   const store = useStore();
@@ -172,8 +192,9 @@ export function Shell() {
         <MenuTrigger>
           <Button className="icon-btn account" aria-label="Tu cuenta"><User className="lucide" /></Button>
           <Popover placement="bottom end" offset={6}>
-            <Menu className="menu-pop" aria-label="Cuenta" onAction={(k) => { if (k === 'logout') void auth?.logout(); }}>
+            <Menu className="menu-pop" aria-label="Cuenta" onAction={(k) => { if (k === 'logout') void auth?.logout(); if (k === 'admin') navigate('/usuarios'); }}>
               <MenuItem id="who" className="menu-item" isDisabled textValue="Usuario">{auth ? `${auth.me.displayName} (${auth.me.username})` : 'Modo sin conexión'}</MenuItem>
+              {auth && auth.me.role !== 'site_owner' && <MenuItem id="admin" className="menu-item">Administración general</MenuItem>}
               {auth && <MenuItem id="logout" className="menu-item">Cerrar sesión</MenuItem>}
             </Menu>
           </Popover>
@@ -195,14 +216,15 @@ export function Shell() {
         <NavLink className="route" to="/importar" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
           <span className="ln" aria-hidden="true" /><span className="lbl">Importar datos</span>
         </NavLink>
-        {auth?.me.isOwner && (
+        {auth && auth.me.role !== 'site_owner' && (
           <NavLink className="route" to="/acceso" title="Acceso por API" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
             <span className="ln" aria-hidden="true" /><span className="lbl">Acceso por API</span>
           </NavLink>
         )}
-        <a className="route" href={site?.publicUrl ?? '/sitio'} target="_blank" rel="noopener" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
+        <NavLink className="route" to="/ver-sitio" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
           <span className="ln" aria-hidden="true" /><span className="lbl">Ver el sitio</span>
-        </a>
+        </NavLink>
+        {auth && auth.me.role !== 'site_owner' && <><h2>CMS</h2><NavLink className="route" to="/usuarios"><span className="ln" aria-hidden="true" /><span className="lbl">Administración general</span></NavLink></>}
         {(!site || DEMO_IDS.includes(site.id)) && <div className="foot"><button type="button" onClick={reset}>Restaurar datos de prueba</button></div>}
       </nav>
       <Outlet />

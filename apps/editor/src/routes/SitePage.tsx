@@ -26,6 +26,12 @@ function nameOf(snap: SiteSnapshot, id: unknown, field: string) {
 
 export function SitePage() {
   const { site } = useSites();
+  if (!site) return <main className="empty"><h1>No tienes sitios asignados</h1><a href="/">Volver al editor</a></main>;
+  return <SitePreview key={site.id} />;
+}
+
+function SitePreview() {
+  const { site } = useSites();
   const { data: snap } = useLive((s) => s.siteSnapshot(), []);
   useEffect(() => { document.title = site?.name ?? 'Sitio'; }, [site?.name]);
   if (snap === undefined) return <div className="site"><div className="site-main"><div className="skeleton" /></div></div>;

@@ -12,6 +12,10 @@ import { ModelsPage } from './routes/ModelsPage';
 import { SitePage } from './routes/SitePage';
 import { ImportPage } from './routes/ImportPage';
 import { ApiAccessPage } from './routes/ApiAccessPage';
+import { UsersPage } from './routes/UsersPage';
+import { SiteSettingsPage } from './routes/SiteSettingsPage';
+import { Administration } from './routes/Administration';
+import { AssignmentsPage } from './routes/AssignmentsPage';
 
 // Tema: el sistema decide salvo que la persona haya elegido otro.
 try {
@@ -25,7 +29,7 @@ const USE_API = import.meta.env.VITE_DATA_SOURCE === 'api';
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Shell />,
+    element: <SitesProvider api={USE_API}><Shell /></SitesProvider>,
     children: [
       { index: true, element: <FirstType /> },
       { path: 'c/:typeId', element: <ContentPage /> },
@@ -34,9 +38,14 @@ const router = createBrowserRouter([
       { path: 'modelos/:typeId', element: <ModelsPage /> },
       { path: 'importar', element: <ImportPage /> },
       { path: 'acceso', element: <ApiAccessPage /> },
+      { path: 'ver-sitio', element: <SiteSettingsPage /> },
     ],
   },
-  { path: '/sitio', element: <SitePage /> },
+  { element: <Administration />, children: [
+    { path: '/usuarios', element: <UsersPage /> },
+    { path: '/asignaciones', element: <AssignmentsPage /> },
+  ] },
+  { path: '/sitio', element: <SitesProvider api={USE_API}><SitePage /></SitesProvider> },
 ]);
 
 createRoot(document.getElementById('root')!).render(
@@ -44,14 +53,10 @@ createRoot(document.getElementById('root')!).render(
     <ToastProvider>
       {USE_API ? (
         <AuthGate>
-          <SitesProvider api>
             <RouterProvider router={router} />
-          </SitesProvider>
         </AuthGate>
       ) : (
-        <SitesProvider api={false}>
           <RouterProvider router={router} />
-        </SitesProvider>
       )}
     </ToastProvider>
   </StrictMode>,

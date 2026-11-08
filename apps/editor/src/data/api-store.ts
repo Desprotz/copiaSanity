@@ -12,8 +12,20 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 /** Sitios: fuera del contrato de contenido porque no pertenecen a ningún sitio. */
 export const sitesApi = {
   list: () => call<Site[]>('/sites'),
-  create: (id: string, name: string) => call<Site>('/sites', { method: 'POST', body: JSON.stringify({ id, name }) }),
+  create: (id: string, name: string, publicUrl = '') => call<Site>('/sites', { method: 'POST', body: JSON.stringify({ id, name, publicUrl }) }),
+  updateUrl: (id: string, publicUrl: string) => call<Site>(`/sites/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ publicUrl }) }),
   remove: async (id: string, confirm: string) => { await call<unknown>(`/sites/${encodeURIComponent(id)}`, { method: 'DELETE', body: JSON.stringify({ confirm }) }); },
+};
+
+export interface UserProfile {
+  id: number; username: string; displayName: string; role: 'super_admin' | 'admin' | 'site_owner';
+  disabled: boolean; createdBy: number | null; siteIds: string[];
+}
+export interface UserInput { displayName: string; role: 'admin' | 'site_owner'; siteIds: string[]; disabled: boolean }
+export const usersApi = {
+  list: () => call<UserProfile[]>('/users'),
+  create: (input: UserInput & { username: string; password: string }) => call<{ id: number }>('/users', { method: 'POST', body: JSON.stringify(input) }),
+  update: (id: number, input: Partial<UserInput>) => call<void>(`/users/${id}`, { method: 'PATCH', body: JSON.stringify(input) }),
 };
 
 /** Metadatos de un token de API (JWT de solo lectura de un sitio). El JWT en sí solo llega al crearlo. */
@@ -22,7 +34,7 @@ export interface ApiToken {
   createdAt: string; expiresAt: string | null; revokedAt: string | null; lastUsedAt: string | null;
 }
 
-/** Tokens de API de un sitio: solo el dueño de la cuenta puede usarlos (el servidor lo comprueba). */
+/** Tokens: Super Admin o Admin asignado al sitio (el servidor lo comprueba). */
 export const tokensApi = {
   list: (site: string) => call<ApiToken[]>(`/sites/${encodeURIComponent(site)}/tokens`),
   create: (site: string, name: string, expiresInDays?: number) =>

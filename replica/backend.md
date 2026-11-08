@@ -96,3 +96,6 @@ const res = await fetch(`${env.CMS_URL}/api/v1/s/${env.SITE_ID}/documents?type=p
 4. **Cron sin despertar Neon:** hoy el Cron Trigger consulta la base cada 5 min, lo que gastaría horas de cómputo del plan gratuito. Usar una marca en Workers KV y abrir Neon solo si hay compilación pendiente (architecture.md).
 5. Deploy hook de Cloudflare Pages en `maybeBuild` y el generador estático `apps/site`.
 6. Copias a Google Drive.
+# Actualización 2026-11-08: usuarios y sitios
+
+Implementados localmente los roles Super Admin, Admin por sitios asignados y dueño del sitio; registro interno, edición de perfiles y dirección pública. Ver [roles-y-sitios.md](roles-y-sitios.md) para permisos, pruebas, migración 007 y pasos de activación. Esta actualización sustituye las notas históricas sobre acceso global del dueño. No se migró ni desplegó producción.
