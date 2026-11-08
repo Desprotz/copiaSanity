@@ -3,6 +3,8 @@
   "name": "mse-cms",
   "main": "src/index.ts",
   "compatibility_date": "2026-11-01",
+  // Workers Builds publica cada rama que no es main (PR) con `wrangler preview`, que exige este bloque (puede ir vacío).
+  "previews": {},
   "compatibility_flags": ["nodejs_compat"],
   // Barrido de publicaciones programadas y compilación agrupada (architecture.md: cada 5 min).
   "triggers": { "crons": ["*/5 * * * *"] },
