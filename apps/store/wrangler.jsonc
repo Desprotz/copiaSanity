@@ -4,6 +4,8 @@
   "name": "tienda-ropa",
   "main": "src/index.ts",
   "compatibility_date": "2026-11-01",
+  // Workers Builds publica cada rama que no es main (PR) con `wrangler preview`, que exige este bloque (puede ir vacío).
+  "previews": {},
   "vars": { "SITE_ID": "tienda-ropa", "CMS_URL": "https://mse-cms.desprotz01.workers.dev" },
   "kv_namespaces": [{ "binding": "FLAGS", "id": "bc1afd8d333341dd9a8a6a6106a9eb4b" }],
   "observability": { "enabled": true }

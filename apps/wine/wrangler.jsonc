@@ -4,6 +4,8 @@
   "name": "vinos-sotara",
   "main": "src/index.ts",
   "compatibility_date": "2026-11-01",
+  // Workers Builds publica cada rama que no es main (PR) con `wrangler preview`, que exige este bloque (puede ir vacío).
+  "previews": {},
   "vars": { "SITE_ID": "vinos" },
   "kv_namespaces": [{ "binding": "FLAGS", "id": "bc1afd8d333341dd9a8a6a6106a9eb4b" }],
   "observability": { "enabled": true }

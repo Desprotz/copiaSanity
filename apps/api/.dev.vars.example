@@ -4,3 +4,4 @@
 DATABASE_URL=postgresql://USUARIO:CONTRASEÑA@HOST.neon.tech/neondb?sslmode=require
 # Segundos que espera la compilación agrupada del sitio (en producción, 300).
 BUILD_BATCH_SECONDS=6
+#prueba
