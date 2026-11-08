@@ -36,6 +36,37 @@
       "port": 8787
     },
     {
+      "name": "api-pruebas",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "-w",
+        "apps/api",
+        "--",
+        "--port",
+        "8790",
+        "--inspector-port",
+        "9239"
+      ],
+      "port": 8790
+    },
+    {
+      "name": "editor-pruebas",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "-w",
+        "apps/editor",
+        "--",
+        "--port",
+        "5175"
+      ],
+      "env": { "CMS_API_URL": "http://127.0.0.1:8790" },
+      "port": 5175
+    },
+    {
       "name": "editor-lento",
       "runtimeExecutable": "npm",
       "runtimeArgs": [

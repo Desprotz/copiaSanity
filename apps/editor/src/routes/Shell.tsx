@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Moon, Plus, Sun, Trash2, User } from 'lucide-react';
+import { Check, ChevronDown, KeyRound, Moon, Plus, Sun, Trash2, User } from 'lucide-react';
 import { Button, Dialog, Heading, Menu, MenuItem, MenuTrigger, Modal, ModalOverlay, Popover, Separator } from 'react-aria-components';
 import { useSites } from '../data/sites';
 import { useAuth } from './Login';
@@ -70,7 +70,7 @@ function SiteSwitcher() {
           <strong>{site?.name}</strong><span className="env" title={multi ? 'Datos en la base de Neon' : 'Datos guardados solo en este navegador'}>{env}</span><ChevronDown className="lucide" aria-hidden="true" />
         </Button>
         <Popover placement="bottom start" offset={6}>
-          <Menu className="menu-pop" aria-label="Tus sitios" onAction={(key) => { if (key === '__new') setOpen(true); else if (key === '__del') { setDelName(''); setDelErr(''); setDelOpen(true); } else go(String(key)); }}>
+          <Menu className="menu-pop" aria-label="Tus sitios" onAction={(key) => { if (key === '__new') setOpen(true); else if (key === '__del') { setDelName(''); setDelErr(''); setDelOpen(true); } else if (key === '__api') navigate('/acceso'); else go(String(key)); }}>
             {sites.map((s) => (
               <MenuItem key={s.id} id={s.id} className="menu-item" textValue={s.name}>
                 <span className="site-dot" aria-hidden="true">{s.name.slice(0, 1).toUpperCase()}</span>{s.name}
@@ -79,6 +79,7 @@ function SiteSwitcher() {
             ))}
             {multi && <Separator className="menu-sep" />}
             {multi && <MenuItem id="__new" className="menu-item" textValue="Nuevo sitio"><Plus className="lucide" aria-hidden="true" />Nuevo sitio…</MenuItem>}
+            {multi && auth?.me.isOwner && site && <MenuItem id="__api" className="menu-item" textValue="Acceso por API"><KeyRound className="lucide" aria-hidden="true" />Acceso por API…</MenuItem>}
             {multi && auth?.me.isOwner && site && <MenuItem id="__del" className="menu-item danger" textValue="Eliminar este sitio"><Trash2 className="lucide" aria-hidden="true" />Eliminar «{site.name}»…</MenuItem>}
           </Menu>
         </Popover>
@@ -194,6 +195,11 @@ export function Shell() {
         <NavLink className="route" to="/importar" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
           <span className="ln" aria-hidden="true" /><span className="lbl">Importar datos</span>
         </NavLink>
+        {auth?.me.isOwner && (
+          <NavLink className="route" to="/acceso" title="Acceso por API" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
+            <span className="ln" aria-hidden="true" /><span className="lbl">Acceso por API</span>
+          </NavLink>
+        )}
         <a className="route" href={site?.publicUrl ?? '/sitio'} target="_blank" rel="noopener" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
           <span className="ln" aria-hidden="true" /><span className="lbl">Ver el sitio</span>
         </a>

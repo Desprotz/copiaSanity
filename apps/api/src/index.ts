@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import * as auth from './auth';
 import * as repo from './repo';
+import * as tokens from './tokens';
 import { HttpError } from './repo';
 
 export interface Env {
@@ -15,9 +16,12 @@ export interface Env {
   BUILD_BATCH_SECONDS?: string;
   /** Marca de compilación pendiente: el Cron la lee y solo abre Neon si toca compilar. */
   FLAGS?: KVNamespace;
+  /** Firma de los JWT de API (wrangler secret put JWT_SECRET). Mínimo 32 caracteres. */
+  JWT_SECRET?: string;
 }
 
-type Vars = { sql: Sql; actor: string; ctx: repo.Ctx; user: auth.SessionUser };
+// Cada solicitud trae una sola identidad: `user` (sesión del editor) o `token` (JWT de un proyecto).
+type Vars = { sql: Sql; actor: string; ctx: repo.Ctx; user: auth.SessionUser; token?: tokens.ProjectToken };
 const app = new Hono<{ Bindings: Env; Variables: Vars }>().basePath('/api/v1');
 
 const MAX_JSON = 1024 * 1024;
@@ -63,17 +67,37 @@ async function buildAndExport(sql: Sql, env: Env, site?: string, force = false) 
 
 const batch = (env: Env) => Math.max(1, Math.min(3600, Number(env.BUILD_BATCH_SECONDS ?? 300) || 300));
 
-// Identidad: inicio de sesión propio (src/auth.ts). Sin sesión válida, todo lo que no sea /auth responde 401.
+/**
+ * Rutas que un JWT de proyecto puede consultar (solo GET y solo de su propio sitio). Todo lo demás
+ * (crear, publicar, borrar, gestionar sitios o tokens) sigue exigiendo la sesión del editor.
+ */
+const TOKEN_ROUTES = /^\/api\/v1\/s\/[a-z0-9-]{2,40}\/(types|documents|documents\/[a-z0-9_]{1,80}|assets\/img_[a-z0-9]{6,20}\/content|site\/snapshot)$/;
+const bearerOf = (h: string | undefined) => /^Bearer\s+([A-Za-z0-9_.-]+)$/i.exec(h ?? '')?.[1];
+
+// Identidad: JWT de proyecto (Authorization: Bearer) o sesión del editor (src/auth.ts). Sin ninguna, todo lo que no sea /auth responde 401.
 app.use('*', async (c, next) => {
   const len = Number(c.req.header('content-length') ?? 0);
   const isImage = c.req.path.endsWith('/assets') && c.req.method === 'POST';
   if (len > (isImage ? MAX_IMAGE : MAX_JSON)) return c.json({ error: 'El contenido es demasiado grande.' }, 413);
+  const bearer = bearerOf(c.req.header('authorization'));
+  if (c.req.header('authorization') && !bearer) return c.json({ error: 'Usa la cabecera Authorization: Bearer <token>.' }, 401);
+  if (bearer && c.req.method !== 'GET') return c.json({ error: 'Los tokens de API solo permiten consultar (GET).' }, 403);
+  if (bearer && !TOKEN_ROUTES.test(c.req.path)) return c.json({ error: 'Este token no da acceso a esta ruta.' }, 403);
   // Defensa contra CSRF además de SameSite=Strict: las escrituras deben venir del propio editor.
   if (c.req.method !== 'GET' && c.req.header('x-cms') !== '1') return c.json({ error: 'Solicitud no permitida.' }, 403);
   const sql = connect(c.env);
   c.set('sql', sql);
   try {
-    if (!c.req.path.startsWith('/api/v1/auth/')) {
+    if (bearer) {
+      const token = await tokens.projectFromJwt(sql, c.env.JWT_SECRET, bearer);
+      if (!token) {
+        c.header('WWW-Authenticate', 'Bearer error="invalid_token"');
+        return c.json({ error: 'El token no es válido, caducó o fue revocado.' }, 401);
+      }
+      if (!token.scopes.includes('read')) return c.json({ error: 'Este token no tiene permiso de lectura.' }, 403);
+      c.set('token', token);
+      c.set('actor', `token:${token.id}`);
+    } else if (!c.req.path.startsWith('/api/v1/auth/')) {
       const user = await auth.sessionUser(sql, getCookie(c, auth.COOKIE));
       if (!user) return c.json({ error: 'Tu sesión terminó. Vuelve a iniciar sesión.' }, 401);
       c.set('user', user);
@@ -174,11 +198,33 @@ app.delete('/sites/:id', async (c) => {
   return c.body(null, 204);
 });
 
+// Tokens de API (JWT) de un sitio: solo el dueño los crea, lista y revoca. El JWT se muestra una sola vez.
+const tokenId = z.string().regex(/^tok_[a-z0-9]{16,32}$/);
+async function ownerSite(c: Context<{ Bindings: Env; Variables: Vars }>) {
+  if (!c.var.user?.isOwner) throw new HttpError(403, 'Solo el dueño de la cuenta puede gestionar tokens de API.');
+  const site = siteId.parse(c.req.param('id'));
+  if (!(await repo.siteExists(c.var.sql, site))) throw new HttpError(404, 'Ese sitio no existe.');
+  return site;
+}
+app.get('/sites/:id/tokens', async (c) => c.json(await tokens.listTokens(c.var.sql, await ownerSite(c))));
+app.post('/sites/:id/tokens', async (c) => {
+  const site = await ownerSite(c);
+  const { name, expiresInDays } = await body(c, z.object({ name: z.string().trim().min(1).max(80), expiresInDays: z.number().int().min(1).max(3650).optional() }));
+  return c.json(await tokens.createToken(c.var.sql, c.env.JWT_SECRET, { site, name, expiresInDays, actor: c.var.actor }), 201);
+});
+app.delete('/sites/:id/tokens/:tokenId', async (c) => {
+  const site = await ownerSite(c);
+  await tokens.revokeToken(c.var.sql, site, tokenId.parse(c.req.param('tokenId')), c.var.actor);
+  return c.body(null, 204);
+});
+
 // Todo lo demás pertenece a un sitio: se comprueba que existe y cada consulta lleva su id.
 app.use('/s/:site/*', async (c, next) => {
   const site = siteId.parse(c.req.param('site'));
   // Un sitio ajeno responde igual que uno inexistente: no se revela qué sitios existen.
-  if (!(await repo.siteExists(c.var.sql, site)) || !(await auth.canUseSite(c.var.sql, c.var.user, site))) throw new HttpError(404, 'Ese sitio no existe.');
+  // Un token solo ve el sitio para el que se emitió.
+  const allowed = c.var.token ? c.var.token.site === site : await auth.canUseSite(c.var.sql, c.var.user, site);
+  if (!allowed || !(await repo.siteExists(c.var.sql, site))) throw new HttpError(404, 'Ese sitio no existe.');
   c.set('ctx', { site, actor: c.var.actor, batchSeconds: batch(c.env) });
   await next();
 });
@@ -198,9 +244,13 @@ app.put('/s/:site/types/:id', async (c) => {
 });
 app.delete('/s/:site/types/:id', async (c) => { await repo.deleteType(c.var.sql, c.var.ctx, param(c, 'id')); return c.body(null, 204); });
 
+// Con token de proyecto solo se ve lo publicado: nunca borradores.
+const publishedOnly = <T extends { draft: unknown }>(d: T): T => ({ ...d, draft: null });
+
 app.get('/s/:site/documents', async (c) => {
   const type = c.req.query('type');
-  return c.json(await repo.listDocuments(c.var.sql, c.var.ctx, type ? id.parse(type) : undefined));
+  const docs = await repo.listDocuments(c.var.sql, c.var.ctx, type ? id.parse(type) : undefined);
+  return c.json(c.var.token ? docs.filter((d) => d.published).map(publishedOnly) : docs);
 });
 app.post('/s/:site/documents', async (c) => {
   const { typeId } = await body(c, z.object({ typeId: id }));
@@ -208,7 +258,8 @@ app.post('/s/:site/documents', async (c) => {
 });
 app.get('/s/:site/documents/:id', async (c) => {
   const d = await repo.getDocument(c.var.sql, c.var.ctx, param(c, 'id'));
-  return d ? c.json(d) : c.json({ error: 'El documento no existe.' }, 404);
+  if (!d || (c.var.token && !d.published)) return c.json({ error: 'El documento no existe.' }, 404);
+  return c.json(c.var.token ? publishedOnly(d) : d);
 });
 app.patch('/s/:site/documents/:id/draft', async (c) => {
   const { data, rev } = await body(c, z.object({ data: docData, rev: z.number().int().positive() }));

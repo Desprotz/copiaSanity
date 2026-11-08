@@ -5,3 +5,8 @@ DATABASE_URL=postgresql://USUARIO:CONTRASEÑA@HOST.neon.tech/neondb?sslmode=requ
 # Segundos que espera la compilación agrupada del sitio (en producción, 300).
 BUILD_BATCH_SECONDS=6
 #prueba
+# Firma de los tokens de API (JWT) que usan los proyectos para consultar el contenido. Mínimo 32 caracteres.
+# Genera uno con:  node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+# En producción va como secreto del Worker (wrangler secret put JWT_SECRET) y debe ser el MISMO valor que aquí
+# si creas los tokens con npm run token desde tu equipo.
+JWT_SECRET=

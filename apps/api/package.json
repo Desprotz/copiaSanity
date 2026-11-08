@@ -6,7 +6,8 @@
     "dev": "node scripts/dev.mjs",
     "migrate": "node scripts/migrate.mjs",
     "typecheck": "tsc --noEmit",
-    "user": "node scripts/create-user.mjs"
+    "user": "node scripts/create-user.mjs",
+    "token": "node scripts/create-token.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261107.1",
