@@ -11,6 +11,7 @@ import { ContentPage } from './routes/ContentPage';
 import { ModelsPage } from './routes/ModelsPage';
 import { SitePage } from './routes/SitePage';
 import { ImportPage } from './routes/ImportPage';
+import { ApiAccessPage } from './routes/ApiAccessPage';
 
 // Tema: el sistema decide salvo que la persona haya elegido otro.
 try {
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
       { path: 'modelos', element: <ModelsPage /> },
       { path: 'modelos/:typeId', element: <ModelsPage /> },
       { path: 'importar', element: <ImportPage /> },
+      { path: 'acceso', element: <ApiAccessPage /> },
     ],
   },
   { path: '/sitio', element: <SitePage /> },

@@ -10,6 +10,7 @@
     "typecheck": "npm run typecheck -w apps/editor && npm run typecheck -w apps/api",
     "dev:api": "npm run dev -w apps/api",
     "migrate": "npm run migrate -w apps/api",
-    "user": "npm run user -w apps/api"
+    "user": "npm run user -w apps/api",
+    "token": "npm run token -w apps/api --"
   }
 }

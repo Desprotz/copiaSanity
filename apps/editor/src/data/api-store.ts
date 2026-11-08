@@ -16,6 +16,20 @@ export const sitesApi = {
   remove: async (id: string, confirm: string) => { await call<unknown>(`/sites/${encodeURIComponent(id)}`, { method: 'DELETE', body: JSON.stringify({ confirm }) }); },
 };
 
+/** Metadatos de un token de API (JWT de solo lectura de un sitio). El JWT en sí solo llega al crearlo. */
+export interface ApiToken {
+  id: string; site: string; name: string; scopes: string[]; createdBy: string;
+  createdAt: string; expiresAt: string | null; revokedAt: string | null; lastUsedAt: string | null;
+}
+
+/** Tokens de API de un sitio: solo el dueño de la cuenta puede usarlos (el servidor lo comprueba). */
+export const tokensApi = {
+  list: (site: string) => call<ApiToken[]>(`/sites/${encodeURIComponent(site)}/tokens`),
+  create: (site: string, name: string, expiresInDays?: number) =>
+    call<ApiToken & { token: string }>(`/sites/${encodeURIComponent(site)}/tokens`, { method: 'POST', body: JSON.stringify({ name, expiresInDays }) }),
+  revoke: async (site: string, id: string) => { await call<unknown>(`/sites/${encodeURIComponent(site)}/tokens/${encodeURIComponent(id)}`, { method: 'DELETE' }); },
+};
+
 /**
  * Capa de datos contra el API propio (apps/api: Hono en Cloudflare Workers + Neon).
  * Mismo contrato que LocalStore: ninguna pantalla sabe cuál de las dos está usando.

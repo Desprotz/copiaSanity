@@ -33,7 +33,9 @@ if (!env[KEY]) {
 mkdirSync(join(root, '..', 'editor', 'dist'), { recursive: true });
 
 // En Windows wrangler es un .cmd y necesita shell: se pasa como una sola línea con los argumentos entre comillas.
-const args = ['dev', '--port', '8787', ...process.argv.slice(2)].map((a) => (/^[\w./:=-]+$/.test(a) ? a : JSON.stringify(a)));
+// El puerto 8787 es solo el valor por defecto: `npm run dev -w apps/api -- --port 8790` levanta otra copia.
+const extra = process.argv.slice(2);
+const args = ['dev', ...(extra.includes('--port') ? [] : ['--port', '8787']), ...extra].map((a) => (/^[\w./:=-]+$/.test(a) ? a : JSON.stringify(a)));
 const child = spawn(`wrangler ${args.join(' ')}`, { cwd: root, env, stdio: 'inherit', shell: true });
 child.on('exit', (code, signal) => process.exit(signal ? 1 : (code ?? 0)));
 for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => child.kill(s));

@@ -31,6 +31,46 @@ Cada web (propia o de un cliente) es un **sitio** con sus tipos, documentos, fot
 
 Pendiente para clientes: quién puede entrar a qué sitio (membresías y roles, M6) y un proyecto de Pages por sitio al desplegar. Las compilaciones de Pages (≈500/mes) y los 50 usuarios de Access se comparten entre todos los sitios de la cuenta.
 
+## Tokens de API para proyectos (migración 006, 2026-11-07)
+
+Cada proyecto (una web, un script, otro servicio) consulta el API con un **JWT de solo lectura** en la cabecera `Authorization`, en vez de usuario y contraseña. El usuario y la contraseña quedan solo para entrar al editor.
+
+**Cómo funciona.** El JWT va firmado con HS256 usando `JWT_SECRET` (secreto del Worker) y lleva `iss=mse-cms`, `aud=mse-cms-api`, `sub=<id del token>`, `kind=project`, `site`, `scope=["read"]`, `iat` y, si se pidió, `exp`. El API verifica firma, algoritmo, emisor, audiencia y caducidad, y después confirma en `cms.api_tokens` que el token no esté revocado (la base manda: revocar o borrar el sitio lo invalida al instante). El JWT no se guarda en ninguna parte; se muestra una sola vez.
+
+**Qué permite.** Solo `GET`, solo del sitio para el que se emitió y solo contenido publicado (nunca borradores):
+
+| Ruta | Devuelve |
+|---|---|
+| `GET /api/v1/s/:sitio/types` | Tipos de contenido |
+| `GET /api/v1/s/:sitio/documents[?type=…]` | Documentos publicados (`draft` siempre `null`) |
+| `GET /api/v1/s/:sitio/documents/:id` | Un documento publicado (404 si no está publicado) |
+| `GET /api/v1/s/:sitio/assets/:id/content` | Bytes de una imagen |
+| `GET /api/v1/s/:sitio/site/snapshot` | Última compilación del sitio (todo lo publicado de una vez) |
+
+Cualquier otra ruta o método con un token responde 403; un token de otro sitio, 404; uno inválido, caducado o revocado, 401.
+
+**Crear, listar y revocar.**
+
+```bash
+npm run token -- --sitio tienda-ropa --nombre "Web de la tienda" --dias 365
+npm run token -- --sitio tienda-ropa --listar
+npm run token -- --sitio tienda-ropa --revocar tok_xxxxxxxxxxxxxxxxxxxx
+```
+
+El dueño también puede hacerlo desde el API con su sesión: `GET/POST /api/v1/sites/:id/tokens` y `DELETE /api/v1/sites/:id/tokens/:tokenId` (pendiente: pantalla en el editor).
+
+**Configurar.** `JWT_SECRET` (mínimo 32 caracteres) en `apps/api/.dev.vars` y, en producción, `wrangler secret put JWT_SECRET` con el **mismo** valor si los tokens se crean desde tu equipo. Cambiar el secreto invalida todos los tokens emitidos.
+
+**Usarlo en un proyecto.** El token se guarda como secreto del proyecto (`wrangler secret put CMS_TOKEN`, variable de entorno, etc.), nunca en el código ni en el navegador:
+
+```ts
+const res = await fetch(`${env.CMS_URL}/api/v1/s/${env.SITE_ID}/documents?type=producto`, {
+  headers: { Authorization: `Bearer ${env.CMS_TOKEN}` },
+});
+```
+
+**A futuro (editor/admin).** El mismo esquema está pensado para crecer: `kind` admitirá `user` para las sesiones del editor y `scopes` otros alcances (`write`, `admin`) agregándolos al check de la migración y a la lista de rutas permitidas (`TOKEN_ROUTES` en `apps/api/src/index.ts`). Hoy el editor sigue con su sesión por cookie.
+
 ## Lista de seguridad
 
 - [x] Secretos solo en variables de entorno: `DATABASE_URL` en `apps/api/.dev.vars`, excluido de git; `.dev.vars.example` sin valores.
@@ -42,6 +82,7 @@ Pendiente para clientes: quién puede entrar a qué sitio (membresías y roles, 
 - [x] `npm audit`: 0 vulnerabilidades (2026-11-07).
 - [x] Falla cerrado: sin `DEV_AUTH` ni Access, todo devuelve 401.
 - [ ] **Verificar el JWT de Cloudflare Access** (emisor, audiencia, caducidad) antes de exponer el API. Bloqueante para desplegar.
+- [x] Tokens de API (JWT HS256) para proyectos: solo lectura, un sitio, solo publicado, revocables; el JWT no se guarda (2026-11-07).
 - [ ] Autorización probada con una segunda persona (llega con roles, M6; hoy hay un único editor).
 - [ ] Límite de solicitudes (reglas de Cloudflare) en el API.
 - [ ] Copia de seguridad semanal a Google Drive (GitHub Actions) y una restauración probada. Neon Free conserva poco historial: no cuenta como copia.
