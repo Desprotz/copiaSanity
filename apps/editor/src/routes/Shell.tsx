@@ -146,7 +146,7 @@ function EmptySiteShell() {
   const auth = useAuth();
   const location = useLocation();
   const manager = auth && auth.me.role !== 'site_owner';
-  return <div><header className="topbar"><img className="logo" src="/logo-mse-blanco.svg" alt="MSE" width={81} height={22} />
+  return <div><header className="topbar"><img className="logo" src="/ofenix-logo-oscuro.png" alt="Ofenix" width={71} height={28} />
     {auth?.me.role === 'super_admin' && <SiteSwitcher />}
     {manager && <NavLink className="btn btn-secondary" to="/usuarios">Usuarios</NavLink>}
     <button className="btn btn-secondary" onClick={() => void auth?.logout()}>Cerrar sesión</button>
@@ -163,7 +163,7 @@ function SiteShell() {
   const { data: docs } = useLive((s) => s.listDocuments(), []);
   const [dark, setDark] = useState(isDark);
 
-  useEffect(() => { document.title = 'Editor MSE'; }, []);
+  useEffect(() => { document.title = 'Ofenix'; }, []);
 
   const toggleTheme = () => {
     const next = isDark() ? 'light' : 'dark';
@@ -183,7 +183,7 @@ function SiteShell() {
     <div className="app">
       <a className="skip" href="#main">Saltar al contenido</a>
       <header className="topbar">
-        <img className="logo" src="/logo-mse-blanco.svg" alt="MSE" width={81} height={22} />
+        <img className="logo" src="/ofenix-logo-oscuro.png" alt="Ofenix" width={71} height={28} />
         <SiteSwitcher />
         <SiteBeacon />
         <button className="icon-btn" type="button" onClick={toggleTheme} aria-label={dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}>

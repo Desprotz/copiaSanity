@@ -45,7 +45,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   return (
     <main className="login">
       <form className="login-card" onSubmit={(e) => { e.preventDefault(); void submit(); }}>
-        <img className="login-logo" src="/logo-mse.svg" alt="MSE" width={110} height={30} />
+        <img className="login-logo" src="/ofenix-logo-color.png" alt="Ofenix" width={123} height={48} />
         <h1>Inicia sesión</h1>
         <p className="muted">Entra para editar tus sitios.</p>
         <div className="field">
