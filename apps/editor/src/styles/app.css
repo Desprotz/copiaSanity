@@ -32,7 +32,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* ---------- Shell ---------- */
 .app { display: grid; grid-template-columns: var(--cms-layout-nav) minmax(0, 1fr); grid-template-rows: var(--cms-layout-topbar) minmax(0, 1fr); height: 100dvh; }
 .topbar { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--cms-space-5); padding: 0 var(--cms-space-5); background: var(--cms-color-shell); color: var(--cms-color-shell-text); }
-.logo { display: block; height: 22px; width: auto; flex: none; }
+.logo { display: block; height: 28px; width: auto; flex: none; }
 .project { display: flex; align-items: center; gap: var(--cms-space-4); min-width: 0; padding: 6px 10px; border-radius: var(--cms-radius-md); color: var(--cms-color-shell-text); }
 .project strong { font-size: var(--cms-text-base); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .project .env { color: var(--cms-color-shell-muted); }
@@ -273,7 +273,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .app { grid-template-columns: minmax(0, 1fr); }
   .rail { display: none; }
   .topbar { gap: var(--cms-space-3); padding: 0 var(--cms-space-4); }
-  .logo { height: 18px; }
+  .logo { height: 24px; }
   .project { flex: 1 1 auto; padding: 6px; }
   .project strong { font-size: var(--cms-text-sm); }
   .project .env, .beacon-btn .t, .topbar .account { display: none; }
@@ -338,9 +338,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .login-card h1 { font-size: var(--cms-text-xl); line-height: var(--cms-text-xl-line); font-weight: 800; margin-top: var(--cms-space-5); }
 .login-card .muted { margin-bottom: var(--cms-space-5); }
 .login-card .field { margin-bottom: var(--cms-space-4); }
-.login-logo { height: 28px; width: auto; }
-[data-theme="dark"] .login-logo { content: url(/logo-mse-blanco.svg); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .login-logo { content: url(/logo-mse-blanco.svg); } }
+.login-logo { height: 48px; width: auto; }
+[data-theme="dark"] .login-logo { content: url(/ofenix-logo-oscuro.png); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .login-logo { content: url(/ofenix-logo-oscuro.png); } }
 
 /* Importar datos (Strapi, JSON, CSV) */
 .imp-help { margin-bottom: var(--cms-space-6); color: var(--cms-color-text-muted); }
