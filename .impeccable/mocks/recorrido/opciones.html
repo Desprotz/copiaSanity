@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ofenix · Opciones del recorrido</title>
+<link rel="stylesheet" href="../../../replica/design/tokens.css">
+<link rel="stylesheet" href="../../../node_modules/@fontsource/manrope/500.css">
+<link rel="stylesheet" href="../../../node_modules/@fontsource/manrope/600.css">
+<link rel="stylesheet" href="../../../node_modules/@fontsource/manrope/700.css">
+<link rel="stylesheet" href="../../../node_modules/@fontsource/manrope/800.css">
+<link rel="stylesheet" href="../../../node_modules/@fontsource/jetbrains-mono/500.css">
+<style>
+*{box-sizing:border-box;margin:0}
+body{background:var(--cms-color-bg);color:var(--cms-color-text);font:400 14px/20px var(--cms-font-sans);font-variant-numeric:tabular-nums;padding:32px 24px 64px;-webkit-font-smoothing:antialiased}
+.mono{font:500 12px/16px var(--cms-font-mono)}
+.wrap{max-width:1080px;margin:0 auto}
+header.top{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+header.top h1{font-size:28px;line-height:34px;font-weight:800;letter-spacing:-.02em}
+header.top p{color:var(--cms-color-text-muted);max-width:62ch;margin-top:6px}
+.ctrl{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.btn{height:40px;padding:0 20px;border-radius:999px;border:1px solid var(--cms-color-border);background:var(--cms-color-surface-raised);color:var(--cms-color-text);font:700 14px var(--cms-font-sans);cursor:pointer;transition:transform 140ms var(--cms-ease),background-color 140ms var(--cms-ease)}
+.btn:active{transform:scale(.96)}
+.btn.primary{background:var(--cms-color-accent);color:var(--cms-color-on-accent);border-color:var(--cms-color-accent)}
+.btn:focus-visible{outline:2px solid var(--cms-color-focus);outline-offset:2px}
+.state-name{font-weight:700;padding:0 4px;align-self:center}
+.opt{background:var(--cms-color-surface-raised);border-radius:16px;box-shadow:var(--cms-shadow-card);padding:24px 28px 28px;margin-bottom:20px;--c:var(--cms-color-line-red);--spring:linear(0,.18 6%,.5 14%,.86 24%,1.06 34%,1.1 40%,1.07 48%,1.01 60%,.99 72%,1)}
+.opt h2{font-size:18px;line-height:26px;font-weight:800;display:flex;gap:10px;align-items:baseline}
+.opt h2 span{font:700 12px var(--cms-font-sans);color:var(--cms-color-text-muted)}
+.opt .why{color:var(--cms-color-text-muted);margin:4px 0 22px;max-width:70ch}
+.demo{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:32px;align-items:start}
+.listrow{border:1px solid var(--cms-color-border);border-radius:10px;padding:12px;display:grid;gap:8px;background:var(--cms-color-bg)}
+.listrow .t{display:flex;justify-content:space-between;font-weight:700;font-size:15px}
+.listrow .m{display:flex;align-items:center;gap:10px}
+.cap{font-size:12px;color:var(--cms-color-text-muted);font-weight:600;margin-bottom:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 8px;border-radius:999px;font-size:12px;font-weight:700;background:var(--cms-color-status-draft-bg);color:var(--cms-color-status-draft)}
+.labels{display:grid;grid-template-columns:repeat(4,1fr);margin-top:12px}
+.labels div{display:grid;gap:2px}
+.labels b{font-weight:700;display:flex;align-items:center;gap:6px;transition:color 300ms var(--cms-ease)}
+.labels small{font-size:12px;color:var(--cms-color-text-muted)}
+.labels .pend b{color:var(--cms-color-text-muted);font-weight:600}
+.labels .now small{color:var(--cms-color-text);font-weight:700}
+.tick{width:14px;height:14px;flex:none;stroke:var(--c);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tick path{stroke-dasharray:20;stroke-dashoffset:20;transition:stroke-dashoffset 420ms var(--cms-ease) 200ms}
+.done .tick path{stroke-dashoffset:0}
+.pend .tick,.now .tick{display:none}
+
+/* A · Tramos */
+.A .bars{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.A .seg{height:10px;border-radius:5px;background:var(--cms-color-line-pending);overflow:hidden;position:relative}
+.A .seg i{position:absolute;inset:0;background:var(--c);transform:scaleX(0);transform-origin:left;transition:transform 700ms var(--spring)}
+.A .seg.done i{transform:scaleX(1)}
+.A .seg.now i{background:var(--cms-color-ember);transform:scaleX(.42);animation:breathe 2.4s var(--cms-ease) infinite}
+@keyframes breathe{50%{transform:scaleX(.56)}}
+.A .mini{display:grid;grid-template-columns:repeat(4,14px);gap:3px}
+.A .mini span{height:5px;border-radius:3px;background:var(--cms-color-line-pending);transition:background-color 400ms var(--cms-ease)}
+.A .mini span.done{background:var(--c)}.A .mini span.now{background:var(--cms-color-ember)}
+
+/* B · Hilo */
+.B .track{position:relative;height:28px}
+.B .track:before{content:"";position:absolute;left:0;right:0;top:13px;height:2px;border-radius:1px;background:var(--cms-color-line-pending)}
+.B .fill{position:absolute;left:0;top:12px;height:4px;border-radius:2px;background:var(--c);width:calc(var(--p)*25%);transition:width 900ms var(--spring)}
+.B .head{position:absolute;top:8px;left:calc(var(--p)*25%);width:22px;height:12px;margin-left:-11px;border-radius:6px;background:var(--cms-color-ember);box-shadow:0 2px 8px rgba(29,26,24,.25);transition:left 900ms var(--spring),opacity 300ms var(--cms-ease)}
+.B .notch{position:absolute;top:6px;width:2px;height:16px;border-radius:1px;background:var(--cms-color-line-pending);transition:background-color 400ms var(--cms-ease)}
+.B .notch.done{background:var(--c)}
+.B .labels div:nth-child(n){padding-left:10px}
+.B .mini{position:relative;width:64px;height:8px}
+.B .mini:before{content:"";position:absolute;left:0;right:0;top:3px;height:2px;background:var(--cms-color-line-pending);border-radius:1px}
+.B .mini i{position:absolute;left:0;top:2px;height:4px;border-radius:2px;background:var(--c);width:calc(var(--p)*25%);transition:width 700ms var(--spring)}
+.B .mini b{position:absolute;top:1px;left:calc(var(--p)*25%);width:10px;height:6px;margin-left:-5px;border-radius:3px;background:var(--cms-color-ember);transition:left 700ms var(--spring)}
+
+/* C · Pasos */
+.C .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.C .col{display:grid;gap:6px;position:relative}
+.C .col+.col:before{content:"";position:absolute;left:-20px;width:20px;top:19px;height:2px;background:var(--cms-color-line-pending);transition:background-color 400ms var(--cms-ease)}
+.C .col.linkdone:before{background:var(--c)}
+.C .step{display:flex;align-items:center;gap:8px;height:40px;padding:0 14px 0 10px;border-radius:999px;border:1.5px dashed var(--cms-color-border-input);color:var(--cms-color-text-muted);font-weight:600;white-space:nowrap;transition:border-color 400ms var(--cms-ease),background-color 400ms var(--cms-ease),color 400ms var(--cms-ease),transform 400ms var(--spring)}
+.C .col small{font-size:12px;color:var(--cms-color-text-muted);padding-left:12px}
+.C .step.done{border:1.5px solid var(--c);color:var(--cms-color-text);font-weight:700;background:color-mix(in srgb,var(--c) 8%,transparent)}
+.C .step.now{border:2px solid var(--cms-color-ember);color:var(--cms-color-text);font-weight:800;background:color-mix(in srgb,var(--cms-color-ember) 12%,transparent);transform:translateY(-2px)}
+.C .col.now small{color:var(--cms-color-text);font-weight:700}
+.C .num{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font:700 11px var(--cms-font-mono);background:var(--cms-color-surface);color:var(--cms-color-text-muted)}
+.C .done .num{display:none}.C .done .tick{display:block}
+.C .mini{display:flex;align-items:center;gap:8px;font-weight:700;font-size:12px}
+.C .mini .of{color:var(--cms-color-text-muted);font-weight:600}
+
+/* D · Barra con etapas */
+.D .bar{position:relative;height:12px;border-radius:6px;background:var(--cms-color-line-pending);overflow:hidden}
+.D .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--c);width:calc(var(--p)*25%);transition:width 900ms var(--spring)}
+.D .bar i:after{content:"";position:absolute;right:0;top:0;bottom:0;width:14px;border-radius:6px;background:var(--cms-color-ember);opacity:var(--ember,1);transition:opacity 300ms var(--cms-ease)}
+.D .bar u{position:absolute;top:0;bottom:0;width:3px;background:var(--cms-color-surface-raised)}
+.D .labels div{padding:0 8px;border-left:2px solid transparent}
+.D .labels .now{border-left-color:var(--cms-color-ember)}
+.D .mini{position:relative;width:72px;height:6px;border-radius:3px;background:var(--cms-color-line-pending);overflow:hidden}
+.D .mini i{position:absolute;inset:0 auto 0 0;border-radius:3px;background:var(--c);width:calc(var(--p)*25%);transition:width 700ms var(--spring)}
+
+/* Actual (referencia) */
+.Z .track{position:relative;display:grid;grid-template-columns:repeat(4,1fr)}
+.Z .track:before{content:"";position:absolute;top:11px;left:12.5%;right:12.5%;height:8px;border-radius:4px;background:var(--cms-color-line-pending)}
+.Z .fill{position:absolute;top:11px;left:12.5%;height:8px;border-radius:4px;background:var(--c);width:calc(max(var(--p) - 1,0)*25%);transition:width 900ms var(--spring)}
+.Z .st{position:relative;z-index:1;display:grid;justify-items:center;gap:6px;text-align:center}
+.Z .st i{width:30px;height:30px;border-radius:50%;border:6px solid var(--cms-color-line-pending);background:var(--cms-color-station-fill)}
+.Z .st.done i{border-color:var(--c)}.Z .st.now i{border-color:var(--cms-color-text);box-shadow:0 0 0 5px var(--cms-color-ember)}
+.Z .st small{font-size:12px;color:var(--cms-color-text-muted)}
+@media (max-width:820px){.demo{grid-template-columns:1fr}.labels small{font-size:11px}}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{transition-duration:0ms!important;animation:none!important}}
+</style></head>
+<body><div class="wrap">
+<header class="top"><div><h1>Recorrido de publicación: 4 alternativas</h1>
+<p>Las cuatro mantienen los 4 pasos, el color del tipo (aquí Propiedades, carmín) y el oro solo en lo que avanza. Usa «Avanzar» para ver cómo se anima cada una al pasar de estado.</p></div>
+<div class="ctrl"><button class="btn" id="prev">◀ Anterior</button><span class="state-name" id="sname"></span><button class="btn primary" id="next">Avanzar ▶</button><button class="btn" id="theme">Claro / oscuro</button></div></header>
+
+<section class="opt A"><h2>A · Tramos <span>sin círculos: cuatro barras que se llenan</span></h2>
+<p class="why">Cada paso es un tramo propio. Lo cumplido se llena con el color del tipo; el paso actual respira en oro. Muy legible a cualquier tamaño y en móvil.</p>
+<div class="demo"><div><div class="bars"><div class="seg"><i></i></div><div class="seg"><i></i></div><div class="seg"><i></i></div><div class="seg"><i></i></div></div><div class="labels"></div></div>
+<div><p class="cap">En la lista</p><div class="listrow"><div class="t">Casa con patio en Barrio Ficticio<span class="mono">13:52</span></div><div class="m"><span class="mini"><span></span><span></span><span></span><span></span></span><span class="chip"></span></div></div></div></div></section>
+
+<section class="opt B"><h2>B · Hilo <span>línea fina con marcas y una brasa que viaja</span></h2>
+<p class="why">Una línea delgada con muescas en cada paso. Una pequeña cápsula de oro marca dónde va el documento y se desliza al avanzar. La más ligera y moderna.</p>
+<div class="demo"><div><div class="track"><span class="fill"></span><span class="notch" style="left:0"></span><span class="notch" style="left:25%"></span><span class="notch" style="left:50%"></span><span class="notch" style="left:75%"></span><span class="notch" style="left:calc(100% - 2px)"></span><span class="head"></span></div><div class="labels"></div></div>
+<div><p class="cap">En la lista</p><div class="listrow"><div class="t">Casa con patio en Barrio Ficticio<span class="mono">13:52</span></div><div class="m"><span class="mini"><i></i><b></b></span><span class="chip"></span></div></div></div></div></section>
+
+<section class="opt C"><h2>C · Pasos <span>etiquetas conectadas, el texto manda</span></h2>
+<p class="why">Cada paso es una píldora con su nombre: hecho = borde del color del tipo y check; actual = borde de oro; pendiente = borde punteado. La más explícita para alguien que no conoce un CMS.</p>
+<div class="demo"><div><div class="steps"></div></div>
+<div><p class="cap">En la lista</p><div class="listrow"><div class="t">Casa con patio en Barrio Ficticio<span class="mono">13:52</span></div><div class="m"><span class="mini"></span><span class="chip"></span></div></div></div></div></section>
+
+<section class="opt D"><h2>D · Barra de avance <span>una sola barra dividida en 4 etapas</span></h2>
+<p class="why">Como una barra de progreso: se llena con resorte y su punta arde en oro mientras falta camino. Cada etapa tiene su nombre debajo; la actual lleva una marca de oro a la izquierda.</p>
+<div class="demo"><div><div class="bar"><i></i><u style="left:25%"></u><u style="left:50%"></u><u style="left:75%"></u></div><div class="labels"></div></div>
+<div><p class="cap">En la lista</p><div class="listrow"><div class="t">Casa con patio en Barrio Ficticio<span class="mono">13:52</span></div><div class="m"><span class="mini"><i></i></span><span class="chip"></span></div></div></div></div></section>
+
+<section class="opt Z"><h2>Actual <span>como referencia</span></h2>
+<p class="why">Línea gruesa con estaciones circulares.</p>
+<div class="demo"><div><div class="track"><span class="fill"></span></div></div><div></div></div></section>
+</div>
+<script>
+const NAMES=['Borrador','Revisado','Publicado','En el sitio'];
+const STATES=[
+ {label:'Falta un campo',done:1,cur:1,notes:['creado 2 nov','falta 1 campo','aún no','aún no'],chip:'Borrador'},
+ {label:'Listo para publicar',done:2,cur:-1,notes:['creado 2 nov','sin errores','pulsa Publicar','aún no'],chip:'Borrador'},
+ {label:'Esperando el sitio',done:3,cur:3,notes:['creado 2 nov','sin errores','hoy 14:02','próximo 14:05'],chip:'Esperando el sitio'},
+ {label:'En el sitio',done:4,cur:-1,notes:['creado 2 nov','sin errores','hoy 14:02','al día'],chip:'En el sitio'}];
+let s=0;
+const tick='<svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+const cls=(i,st)=>i<st.done?'done':i===st.cur?'now':'pend';
+function labels(el,st){el.innerHTML=NAMES.map((n,i)=>`<div class="${cls(i,st)}"><b>${tick}${n}</b><small>${st.notes[i]}</small></div>`).join('')}
+function render(){const st=STATES[s];document.getElementById('sname').textContent=st.label;
+ document.querySelectorAll('.labels').forEach(l=>labels(l,st));
+ document.querySelectorAll('.chip').forEach(c=>c.textContent=st.chip);
+ // A
+ document.querySelectorAll('.A .seg').forEach((e,i)=>e.className='seg '+cls(i,st));
+ document.querySelectorAll('.A .mini span').forEach((e,i)=>e.className=cls(i,st));
+ // B: la cápsula se queda en el paso actual o al final del tramo cumplido
+ const pB=st.cur>=0?st.cur:st.done-1+(st.done===4?1:0);
+ document.querySelectorAll('.B').forEach(b=>{b.style.setProperty('--p',Math.min(pB,4));b.querySelector('.head').style.opacity=st.done===4?0:1});
+ document.querySelectorAll('.B .notch').forEach((e,i)=>e.className='notch '+(i<st.done?'done':''));
+ // C
+ document.querySelector('.C .steps').innerHTML=NAMES.map((n,k)=>`<div class="col ${cls(k,st)} ${k<st.done?'linkdone':''}"><span class="step ${cls(k,st)}"><span class="num">${k+1}</span>${tick}${n}</span><small>${st.notes[k]}</small></div>`).join('');
+ document.querySelector('.C .mini').innerHTML=`${NAMES[Math.min(st.cur>=0?st.cur:st.done-1,3)]} <span class="of">· ${st.done} de 4</span>`;
+ // D
+ document.querySelectorAll('.D').forEach(d=>{d.style.setProperty('--p',st.done);d.style.setProperty('--ember',st.done===4?0:1)});
+ // Actual
+ document.querySelectorAll('.Z').forEach(z=>z.style.setProperty('--p',st.done));
+ document.querySelector('.Z .track').innerHTML='<span class="fill"></span>'+NAMES.map((n,i)=>`<div class="st ${cls(i,st)}"><i></i><b>${n}</b><small>${st.notes[i]}</small></div>`).join('');
+}
+document.getElementById('next').onclick=()=>{s=(s+1)%4;render()};
+document.getElementById('prev').onclick=()=>{s=(s+3)%4;render()};
+document.getElementById('theme').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'};
+document.documentElement.dataset.theme='light';render();
+</script></body></html>

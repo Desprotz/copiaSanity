@@ -1,7 +1,7 @@
 import { FileText, Plus, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { docState, docTitle, formatWhen } from '../data/domain';
+import { docState, docTitle, formatWhen, validate, workingData } from '../data/domain';
 import { useLive, useStore } from '../data/hooks';
 import type { DocState } from '../data/types';
 import { LINE_VAR, MiniRoute, StateBadge, useToast } from '../components/ui';
@@ -70,11 +70,11 @@ export function ContentPage() {
               {docs?.length ? <><strong>Nada coincide</strong><span>Prueba otra palabra o quita el filtro.</span></> : <><strong>Todavía no hay {type?.plural.toLowerCase()}</strong><button className="btn btn-primary btn-sm" type="button" onClick={create}>Crear el primero</button></>}
             </div>
           )}
-          {rows?.map(({ d, title, state }) => (
-            <Link key={d.id} className="doc" to={`/c/${typeId}/${d.id}`} aria-current={d.id === docId ? 'page' : undefined}>
+          {rows?.map(({ d, title, state }, i) => (
+            <Link key={d.id} className="doc" viewTransition to={`/c/${typeId}/${d.id}`} aria-current={d.id === docId ? 'page' : undefined} style={{ ['--i' as string]: Math.min(i, 10) }}>
               <span className="t">{title}</span>
               <span className="when mono">{formatWhen(d.updatedAt)}</span>
-              <span className="meta">{type && <MiniRoute state={state} color={type.color} />}<StateBadge state={state} /></span>
+              <span className="meta">{type && <MiniRoute state={state} color={type.color} reviewed={Object.keys(validate(type, workingData(d))).length === 0} />}<StateBadge state={state} /></span>
             </Link>
           ))}
         </div>
@@ -85,7 +85,7 @@ export function ContentPage() {
         ) : (
           <div className="editor-inner">
             <div className="empty" style={{ paddingTop: 'var(--cms-space-9)' }}>
-              <span className="mini" aria-hidden="true" style={{ ['--c' as string]: type ? LINE_VAR[type.color] : undefined }}><i className="on" /><b className="on" /><i className="on" /><b className="on" /><i className="on" /></span>
+              <span className="mini" aria-hidden="true" style={{ ['--c' as string]: type ? LINE_VAR[type.color] : undefined }}><i className="on" /><i className="on" /><i className="on" /><i className="on" /></span>
               <strong>Elige un documento de la lista</strong>
               <span>o crea uno nuevo para empezar su recorrido.</span>
             </div>

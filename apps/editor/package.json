@@ -10,8 +10,8 @@
     "dev:lento": "vite --port 5174 --mode lento"
   },
   "dependencies": {
-    "@fontsource/overpass": "^5.3.0",
-    "@fontsource/overpass-mono": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
     "@tiptap/pm": "^3.33.0",
     "@tiptap/react": "^3.33.0",
     "@tiptap/starter-kit": "^3.33.0",
