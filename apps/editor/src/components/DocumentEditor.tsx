@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Check, Copy, Ellipsis, RotateCcw, Trash2, TriangleAlert, Undo2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Copy, Ellipsis, Maximize2, Minimize2, RotateCcw, Trash2, TriangleAlert, Undo2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Dialog, Heading, Menu, MenuItem, MenuTrigger, Modal, ModalOverlay, Popover } from 'react-aria-components';
 import { Link, NavLink, useNavigate } from 'react-router';
@@ -12,6 +12,17 @@ import { LINE_VAR, stationsDone, useToast } from './ui';
 const WIDE = ['text', 'richtext', 'image'];
 
 interface Props { docId: string; type: ContentType; types: ContentType[] }
+
+/** Modo enfoque: oculta el riel y la lista para que el documento ocupe la pantalla. Se apaga al salir del editor. */
+function useFocusMode() {
+  const [on, setOn] = useState(() => document.documentElement.dataset.focus === 'on');
+  useEffect(() => {
+    if (on) document.documentElement.dataset.focus = 'on';
+    else delete document.documentElement.dataset.focus;
+  }, [on]);
+  useEffect(() => () => { delete document.documentElement.dataset.focus; }, []);
+  return [on, setOn] as const;
+}
 
 export function DocumentEditor({ docId, type, types }: Props) {
   const store = useStore();
@@ -27,8 +38,8 @@ export function DocumentEditor({ docId, type, types }: Props) {
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [conflict, setConflict] = useState<CmsDocument | null>(null);
   const [publishing, setPublishing] = useState(false);
-  const [train, setTrain] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [focus, setFocus] = useFocusMode();
   const rev = useRef(0);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   // Guardado en fila: nunca hay dos guardados en camino a la vez (en producción cada uno tarda ~1 s),
@@ -123,7 +134,6 @@ export function DocumentEditor({ docId, type, types }: Props) {
     setPublishing(true);
     try {
       await flush();
-      setTrain(true);
       await store.publish(docId, rev.current);
       toast(`Publicado. El sitio se actualiza a las ${formatTime((await store.siteStatus()).nextBuildAt)}.`);
     } catch (e) {
@@ -162,6 +172,10 @@ export function DocumentEditor({ docId, type, types }: Props) {
         <span className={`saved ${savedAt ? 'flash' : ''}`} key={savedAt ?? 'x'} aria-live="polite">
           {saving ? 'Guardando…' : <><Check className="lucide" aria-hidden="true" />Guardado {formatTime(savedAt ?? doc.updatedAt)}</>}
         </span>
+        <button className="icon-btn focus-toggle" type="button" aria-pressed={focus} onClick={() => setFocus(!focus)}
+          aria-label="Modo enfoque" title={focus ? 'Salir del modo enfoque' : 'Modo enfoque: ocultar el menú y la lista'}>
+          {focus ? <Minimize2 className="lucide" aria-hidden="true" /> : <Maximize2 className="lucide" aria-hidden="true" />}
+        </button>
         <MenuTrigger>
           <Button className="icon-btn more" aria-label="Más acciones"><Ellipsis className="lucide" /></Button>
           <Popover placement="bottom end" offset={6}>
@@ -190,7 +204,7 @@ export function DocumentEditor({ docId, type, types }: Props) {
         </div>
       )}
 
-      <Journey state={state} errors={errorKeys.length} doc={doc} nextBuildAt={site?.nextBuildAt ?? null} building={site?.building ?? false} train={train}>
+      <Journey state={state} errors={errorKeys.length} doc={doc} nextBuildAt={site?.nextBuildAt ?? null} building={site?.building ?? false}>
         <button className="btn btn-primary" type="button" onClick={publish} disabled={publishing || !canPublish} aria-describedby={firstMissing ? 'missing-hint' : undefined}>
           {buttonLabel}
         </button>
@@ -235,13 +249,13 @@ export function DocumentEditor({ docId, type, types }: Props) {
   );
 }
 
-function Journey({ state, errors, doc, nextBuildAt, building, train, children }: { state: DocState; errors: number; doc: CmsDocument; nextBuildAt: string | null; building: boolean; train: boolean; children: React.ReactNode }) {
+function Journey({ state, errors, doc, nextBuildAt, building, children }: { state: DocState; errors: number; doc: CmsDocument; nextBuildAt: string | null; building: boolean; children: React.ReactNode }) {
   const reviewed = errors === 0;
   const done = Math.max(reviewed ? 1 : 0, stationsDone(state));
   const prevDone = useRef(done);
   const [arrived, setArrived] = useState<number | null>(null);
   useEffect(() => {
-    if (done > prevDone.current) { setArrived(done); const t = setTimeout(() => setArrived(null), 600); prevDone.current = done; return () => clearTimeout(t); }
+    if (done > prevDone.current) { setArrived(done); const t = setTimeout(() => setArrived(null), 900); prevDone.current = done; return () => clearTimeout(t); }
     prevDone.current = done;
   }, [done]);
 
@@ -255,16 +269,22 @@ function Journey({ state, errors, doc, nextBuildAt, building, train, children }:
   ];
   const label = `Recorrido de publicación: ${stations.map((s) => `${s.name} ${s.cls === 'done' ? 'cumplido' : s.cls === 'now' ? 'actual' : 'pendiente'}`).join(', ')}.`;
 
+  // Cada paso es un tramo: lo cumplido se llena con el color del tipo y el paso actual respira en oro.
   return (
-    <section className={`journey ${train ? 'has-train' : ''}`} aria-label={label}>
-      <div className="track" style={{ ['--p' as string]: done }}>
-        <span className="fill" aria-hidden="true" />
-        <span className="train" aria-hidden="true" />
-        {stations.map((s, i) => (
-          <div key={s.name} className={`stop ${s.cls} ${arrived === i ? 'arrive' : ''}`} aria-hidden="true">
-            <span className="dot" /><strong>{s.name}</strong><small>{s.note}</small>
-          </div>
-        ))}
+    <section className="journey" aria-label={label}>
+      <div className="track">
+        <div className="segs" aria-hidden="true">
+          {stations.map((s, i) => (
+            <span key={s.name} className={`seg ${s.cls} ${arrived === i ? 'arrive' : ''}`} style={{ ['--i' as string]: i }}><i /></span>
+          ))}
+        </div>
+        <div className="stops" aria-hidden="true">
+          {stations.map((s) => (
+            <div key={s.name} className={`stop ${s.cls}`}>
+              <strong><Check className="lucide tick" aria-hidden="true" />{s.name}</strong><small>{s.note}</small>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="pub-wrap">{children}</div>
     </section>

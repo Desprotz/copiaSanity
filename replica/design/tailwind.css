@@ -18,6 +18,7 @@
   --color-accent-subtle: var(--cms-color-accent-subtle);
   --color-on-accent: var(--cms-color-on-accent);
   --color-focus: var(--cms-color-focus);
+  --color-ember: var(--cms-color-ember);
   --color-danger: var(--cms-color-danger);
   --color-danger-subtle: var(--cms-color-danger-subtle);
   --color-on-danger: var(--cms-color-on-danger);

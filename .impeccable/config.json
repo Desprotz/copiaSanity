@@ -20,6 +20,36 @@
         "value": "hanken grotesk",
         "createdAt": "2026-11-07T11:24:35.284Z",
         "reason": "Claude: tipografía propia de la web de cliente Viña Sotará; DESIGN.md describe solo el editor"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "2px",
+        "createdAt": "2026-11-27T01:02:28.807Z",
+        "reason": "Claude: radio de extremo redondeado = mitad del grosor del trazo (líneas de 4/6/8 px, línea de foco de 3 px, tren de 18 px), regla del trazo en DESIGN.md"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "3px",
+        "createdAt": "2026-11-27T01:02:29.305Z",
+        "reason": "Claude: radio de extremo redondeado = mitad del grosor del trazo (líneas de 4/6/8 px, línea de foco de 3 px, tren de 18 px), regla del trazo en DESIGN.md"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "4px",
+        "createdAt": "2026-11-27T01:02:29.801Z",
+        "reason": "Claude: radio de extremo redondeado = mitad del grosor del trazo (líneas de 4/6/8 px, línea de foco de 3 px, tren de 18 px), regla del trazo en DESIGN.md"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "9px",
+        "createdAt": "2026-11-27T01:02:30.297Z",
+        "reason": "Claude: radio de extremo redondeado = mitad del grosor del trazo (líneas de 4/6/8 px, línea de foco de 3 px, tren de 18 px), regla del trazo en DESIGN.md"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "5px",
+        "createdAt": "2026-11-27T01:12:22.315Z",
+        "reason": "Claude: radio de extremo redondeado = mitad del alto del tramo de 10 px del recorrido (regla del trazo en DESIGN.md)"
       }
     ]
   }

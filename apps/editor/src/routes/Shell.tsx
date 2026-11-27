@@ -1,4 +1,4 @@
-import { Check, ChevronDown, KeyRound, Moon, Plus, Sun, Trash2, User } from 'lucide-react';
+import { Check, ChevronDown, Globe, KeyRound, Moon, Plus, Shapes, Sun, Trash2, Upload, User, Users } from 'lucide-react';
 import { Button, Dialog, Heading, Menu, MenuItem, MenuTrigger, Modal, ModalOverlay, Popover, Separator } from 'react-aria-components';
 import { useSites } from '../data/sites';
 import { useAuth } from './Login';
@@ -146,7 +146,7 @@ function EmptySiteShell() {
   const auth = useAuth();
   const location = useLocation();
   const manager = auth && auth.me.role !== 'site_owner';
-  return <div><header className="topbar"><img className="logo" src="/logo-mse-blanco.svg" alt="MSE" width={81} height={22} />
+  return <div><header className="topbar"><img className="logo" src="/ofenix-logo-oscuro.png" alt="Ofenix" width={71} height={28} />
     {auth?.me.role === 'super_admin' && <SiteSwitcher />}
     {manager && <NavLink className="btn btn-secondary" to="/usuarios">Usuarios</NavLink>}
     <button className="btn btn-secondary" onClick={() => void auth?.logout()}>Cerrar sesión</button>
@@ -163,11 +163,14 @@ function SiteShell() {
   const { data: docs } = useLive((s) => s.listDocuments(), []);
   const [dark, setDark] = useState(isDark);
 
-  useEffect(() => { document.title = 'Editor MSE'; }, []);
+  useEffect(() => { document.title = 'Ofenix'; }, []);
 
   const toggleTheme = () => {
     const next = isDark() ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
+    const apply = () => { document.documentElement.dataset.theme = next; };
+    // Fundido suave entre claro y oscuro cuando el navegador lo permite y no se pidió reducir el movimiento.
+    if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(apply);
+    else apply();
     try { localStorage.setItem('cms.theme', next); } catch { /* sin almacenamiento */ }
     setDark(next === 'dark');
   };
@@ -183,7 +186,7 @@ function SiteShell() {
     <div className="app">
       <a className="skip" href="#main">Saltar al contenido</a>
       <header className="topbar">
-        <img className="logo" src="/logo-mse-blanco.svg" alt="MSE" width={81} height={22} />
+        <img className="logo" src="/ofenix-logo-oscuro.png" alt="Ofenix" width={71} height={28} />
         <SiteSwitcher />
         <SiteBeacon />
         <button className="icon-btn" type="button" onClick={toggleTheme} aria-label={dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}>
@@ -203,28 +206,29 @@ function SiteShell() {
       <nav className="rail" aria-label="Contenido">
         <h2>Contenido</h2>
         {types?.map((t) => (
-          <NavLink key={t.id} className="route" to={`/c/${t.id}`} style={{ ['--c' as string]: LINE_VAR[t.color] }}>
+          <NavLink key={t.id} className="route" viewTransition to={`/c/${t.id}`} style={{ ['--c' as string]: LINE_VAR[t.color] }}>
             <span className="ln" aria-hidden="true" />
             <span className="lbl">{t.plural}</span>
             <span className="n mono">{docs?.filter((d) => d.typeId === t.id).length ?? ''}</span>
           </NavLink>
         ))}
+        {/* Las líneas de color son solo para tipos de contenido; las herramientas del proyecto llevan icono. */}
         <h2>Proyecto</h2>
-        <NavLink className="route" to="/modelos" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
-          <span className="ln" aria-hidden="true" /><span className="lbl">Tipos de contenido</span>
+        <NavLink className="route tool" to="/modelos">
+          <Shapes className="lucide" aria-hidden="true" /><span className="lbl">Tipos de contenido</span>
         </NavLink>
-        <NavLink className="route" to="/importar" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
-          <span className="ln" aria-hidden="true" /><span className="lbl">Importar datos</span>
+        <NavLink className="route tool" to="/importar">
+          <Upload className="lucide" aria-hidden="true" /><span className="lbl">Importar datos</span>
         </NavLink>
         {auth && auth.me.role !== 'site_owner' && (
-          <NavLink className="route" to="/acceso" title="Acceso por API" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
-            <span className="ln" aria-hidden="true" /><span className="lbl">Acceso por API</span>
+          <NavLink className="route tool" to="/acceso" title="Acceso por API">
+            <KeyRound className="lucide" aria-hidden="true" /><span className="lbl">Acceso por API</span>
           </NavLink>
         )}
-        <NavLink className="route" to="/ver-sitio" style={{ ['--c' as string]: 'var(--cms-color-shell-muted)' }}>
-          <span className="ln" aria-hidden="true" /><span className="lbl">Ver el sitio</span>
+        <NavLink className="route tool" to="/ver-sitio">
+          <Globe className="lucide" aria-hidden="true" /><span className="lbl">Ver el sitio</span>
         </NavLink>
-        {auth && auth.me.role !== 'site_owner' && <><h2>CMS</h2><NavLink className="route" to="/usuarios"><span className="ln" aria-hidden="true" /><span className="lbl">Administración general</span></NavLink></>}
+        {auth && auth.me.role !== 'site_owner' && <><h2>CMS</h2><NavLink className="route tool" to="/usuarios"><Users className="lucide" aria-hidden="true" /><span className="lbl">Administración general</span></NavLink></>}
         {(!site || DEMO_IDS.includes(site.id)) && <div className="foot"><button type="button" onClick={reset}>Restaurar datos de prueba</button></div>}
       </nav>
       <Outlet />

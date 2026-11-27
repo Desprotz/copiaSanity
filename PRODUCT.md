@@ -35,11 +35,13 @@ Editing sessions of variable length on desktop and on phone. Content is publishe
 - 79 active capabilities ordered M1–M6 in replica/features.csv; AI features deferred.
 - Must not copy Sanity's code, logos, icons, illustrations, texts, fonts or signature look.
 - Free-tier limits shape the UX: site builds are batched, images are resized in the browser before upload.
-- Undecided: product name and brand (replica-brand later).
+- Product name decided 2026-11-26: **Ofenix**.
 
 ## Brand Commitments
 
-Company brand: MSE (owner's company). Official logo files supplied by the owner on 2026-11-07, copied to replica/design/assets/ (logo-mse.svg for light grounds, logo-mse-blanco.svg for dark grounds, favicon.svg). Brand colors read from the logo: navy #10233d and blue #2f63f5 (lighter blue #5b8cff on the white version). Use the logo as supplied; do not redraw or recolor it. The CMS product itself has no separate name yet. Owner asked (2026-11-07) for an editor that feels current, technological and at the forefront of today's interfaces, without sacrificing intuitiveness.
+Product brand: **Ofenix** (since 2026-11-26; replaces the MSE branding in the editor). Logo: a phoenix symbol plus the "Ofenix" wordmark, supplied by the owner (assets/brand/ofenix/, copies in apps/editor/public/). The owner rejected the proposal's orange + navy; the logo is recoloured to the "Brasa y ceniza" palette: phoenix in ember gold #d99a1e, wordmark in charcoal #1d1a18 on light grounds and white on the charcoal bar. Do not redraw the symbol; recolouring within the palette is allowed. A vector (SVG) version of the logo is still pending from the owner. Owner asked for an editor that feels current, technological and at the forefront of today's interfaces, without sacrificing intuitiveness, where information is clear and precise, and that does not look like another CMS (Sanity, WordPress, Contentful, Strapi).
+
+Company brand: MSE (owner's company) is no longer shown in the editor.
 
 ## Evidence on Hand
 

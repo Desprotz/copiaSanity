@@ -10,7 +10,8 @@ export const LINE_VAR: Record<LineColor, string> = {
   violet: 'var(--cms-color-line-violet)',
 };
 
-export const LINE_NAME: Record<LineColor, string> = { red: 'Escarlata', blue: 'Azul', green: 'Verde', amber: 'Ámbar', violet: 'Violeta' };
+/** La clave 'amber' se conserva en datos y API; en Ofenix se muestra turquesa para no confundirse con el oro de brasa. */
+export const LINE_NAME: Record<LineColor, string> = { red: 'Carmín', blue: 'Azul', green: 'Verde', amber: 'Turquesa', violet: 'Violeta' };
 
 export function StateBadge({ state }: { state: DocState }) {
   return <span className={`state s-${state}`}>{STATE_LABEL[state]}</span>;
@@ -21,18 +22,13 @@ export function stationsDone(state: DocState): number {
   return { draft: 0, changed: 0, waiting: 2, live: 3 }[state];
 }
 
-export function MiniRoute({ state, color }: { state: DocState; color: LineColor }) {
-  const done = stationsDone(state);
-  const cur = state === 'live' ? -1 : state === 'waiting' ? 3 : 1;
-  const stations = [0, 1, 2, 3];
+/** Mismo cálculo que el recorrido grande del editor: la lista y el editor nunca dicen estaciones distintas. */
+export function MiniRoute({ state, color, reviewed }: { state: DocState; color: LineColor; reviewed: boolean }) {
+  const done = Math.max(reviewed ? 1 : 0, stationsDone(state));
+  const cur = !reviewed ? 1 : state === 'waiting' ? 3 : -1;
   return (
     <span className="mini" aria-hidden="true" style={{ ['--c' as string]: LINE_VAR[color] }}>
-      {stations.map((i) => (
-        <span key={i} style={{ display: 'contents' }}>
-          {i > 0 && <b className={i <= done ? 'on' : ''} />}
-          <i className={i === cur ? 'cur' : i <= done ? 'on' : ''} />
-        </span>
-      ))}
+      {[0, 1, 2, 3].map((i) => <i key={i} className={i === cur ? 'cur' : i <= done ? 'on' : ''} />)}
     </span>
   );
 }
